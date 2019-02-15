@@ -1,0 +1,71 @@
+<html>
+	<head>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+		<title>HAPI Plot Server</title>
+		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+		<link rel="icon" href="favicon.ico" type="image/x-icon">
+	</head>
+  	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script>
+	var exampleURLs = [
+		"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=false",
+		"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&format=gallery"
+		];
+
+	$(document).ready(function(){
+		var exampleul = $('#examples');
+		$.each(exampleURLs, function(i)
+			{
+				var li = $('<li>').appendTo(exampleul);
+				var a  = $('<a>')
+							.attr("href","?" + exampleURLs[i])
+							.text("?" + exampleURLs[i])
+							.appendTo(li);
+			});
+	})
+	</script>
+	<body>
+		<p>
+			Plot data from a HAPI server using the <code>hapiplot</code> function in <a href="http://github.com/hapi-server/client-python">hapiclient</a>
+		</p>
+		<p>
+			Source: <a href="http://github.com/hapi-server/plotserver-python">http://github.com/hapi-server/plotserver-python</a>
+		</p>
+		<h3>Parameters</h3>
+		<p>
+			<ul>
+				<li><code>server</code> A URL to a HAPI server (must end in <code>/hapi</code>)</li>
+				<li><code>id</code> A dataset ID</li>
+				<li><code>parameters</code> A parameter in the dataset. At present, <code>PARAMETERS
+			</code> can only be a single parameter</li>
+				<li><code>time.min</code> Start time for plot</li>
+				<li><code>time.max</code> End time for plot</li>
+				<li><code>format</code> [<code>png</code>], <code>svg</code>, <code>pdf</code>, or <code>gallery</code></li>
+				<li><code>transparent</code> [<code>true</code>] or <code>false</code> Make background transparent (results in smaller png files)</li>
+				<li><code>usecache</code> [<code>true</code>] or <code>false</code> If true, serve cached image if available</li>
+				<li><code>figsize</code> [<code>7,3</code>] image size in inches</li>
+				<li><code>dpi</code> [<code>144</code>] dpi of image (ignored if <code>format</code> is not <code>png</code>)</li>
+			</ul>
+		<h3>Usage</h3>
+		<h4><code>format</code> = <code>png</code>, <code>svg</code>, and <code>pdf</code></h4>
+		<p>
+			Returns an image of <code>PARAMETERS</code> in dataset <code>ID</code> plotted over the timerange <code>START/STOP</code>.
+		</p>
+		<p>
+			<code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&time.max=START&time.min=STOP</code> 
+		</p>
+		<h4><code>format</code> = <code>gallery</code></h4>
+		<p>
+			<ul>
+				<li><code>?server=HAPIURL&id=ID&format=gallery</code></li>
+				<li><code>?server=HAPIURL&id=ID&&amp;parameters=PARAMETERS&format=gallery</code></li>
+				<li><code>?server=HAPIURL&id=ID&&amp;parameters=PARAMETERS&time.max=START&time.min=STOP&format=gallery</code></li>
+			</ul>
+		</p>
+		<h3>Examples</h3>
+		<p>
+			<ul id="examples">
+			</ul>
+		</p>
+	</body>
+</html>

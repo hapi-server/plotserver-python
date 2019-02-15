@@ -1,0 +1,48 @@
+desc="""
+Plot data from a HAPI server.
+
+    List options and usage:
+        hapiplotserver.py -h
+
+Version: 0.0.2
+"""
+
+import sys
+import optparse
+
+from hapiplotserver.config import config
+from hapiplotserver.main import hapiplotserver
+
+# Entry point for command line.
+if __name__ == "__main__":
+
+    conf = config()
+    parser = optparse.OptionParser(add_help_option=False)
+
+    parser.add_option('-h', '--help', dest='help', action='store_true', help='show this help message and exit')
+
+    parser.add_option("--port", help="Server port " + "[%s]" % conf['port'], default=conf['port'])
+    parser.add_option("--cachedir", help="Cache directory " + "[%s]" % conf['cachedir'], default=conf['cachedir'])
+    parser.add_option("--loglevel", help="Log level " + "(error, default, debug) [%s]" % conf['loglevel'], default=conf['loglevel'])
+    parser.add_option("--threaded", type="int", help="Run each request in separate thread (0=no or 1=yes) " + "[%s]" % int(conf['threaded']), default=int(conf['threaded']))
+    parser.add_option("--usecache", type="int", help="Use cached data and images (0=no or 1=yes) " + "[%s]" % int(conf['usecache']), default=int(conf['usecache']))
+    parser.add_option("--workers", type="int", help="# of Gunicorn workers. If > 0, Gunicorn is used and 'threaded' option ignored. " + "[%s]" % int(conf['workers']), default=int(conf['workers']))
+
+    (options, args) = parser.parse_args()
+
+    if options.help:
+        parser.print_help()
+        print(desc)
+        sys.exit(0)
+
+    opts = {'port': options.port,
+            'cachedir': options.cachedir,
+            'usecache': bool(options.usecache),
+            'loglevel': options.loglevel,
+            'threaded': bool(options.threaded),
+            'workers': int(options.workers)
+            }
+    hapiplotserver(**opts)
+
+
+
