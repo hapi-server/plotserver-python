@@ -1,6 +1,5 @@
-from hapiclient.hapi import hapi
-from hapiclient.util import system, download
-from hapiclient.hapiplot import hapiplot, imagepath
+from hapiclient.hapi import hapi, request2path
+from hapiclient.hapiplot import hapiplot
 
 def errorimage(figsize, format, dpi, message):
 
@@ -41,7 +40,6 @@ def errorimage(figsize, format, dpi, message):
 
 def plot(server, dataset, parameters, start, stop, **kwargs):
 
-    import os
     import traceback
     import time
 
@@ -56,17 +54,12 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
     logging = False
     if loglevel == 'debug': logging = True
 
-    if usecache:
-        opts = {'cachedir': cachedir, 'format': format, 'figsize': figsize, 'dpi': dpi, 'transparent': transparent}
-        fnameimg = imagepath(server, dataset, parameters, start, stop, **opts)
-        if os.path.isfile(fnameimg):
-            if loglevel == 'debug': print('hapiplotserver.plot(): Returning cached image from ' + fnameimg)
-            with open(fnameimg, "rb") as f:
-                return f.read(), None
-    
     try:
         tic = time.time()
-        opts = {'logging': logging, 'cachedir': cachedir, 'usecache': usecache}
+        opts = {'logging': logging,
+                'cachedir': cachedir,
+                'usecache': usecache
+                }
         data, meta = hapi(server, dataset, parameters, start, stop, **opts)
         if loglevel == 'debug': print('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
     except Exception as e:
@@ -76,9 +69,24 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
 
     try:
         tic = time.time()
-        popts = {'logging': logging, 'cachedir': cachedir, 'returnimage': True, 'transparent': transparent, 'usecache': usecache, 'returnformat': format, 'figsize': figsize, 'dpi': dpi}
-        img = hapiplot(data, meta, **popts)
-        if loglevel == 'debug': print('hapiplotserver.plot(): Time for hapiplot() call = %f' % (time.time()-tic))
+        popts = {'logging': logging,
+                 'cachedir': cachedir,
+                 'returnimage': True,
+                 'usecache': usecache,
+                 'saveimage': True,
+                 'rcParams': {'savefig.transparent': transparent,
+                              'savefig.format': format,
+                              'savefig.dpi': dpi,
+                              'figure.figsize': figsize
+                              }
+                 }
+
+        meta = hapiplot(data, meta, **popts)
+        pn = -1 + len(meta['parameters'])
+        img = meta['parameters'][pn]['hapiplot']['image']
+
+        if loglevel == 'debug':
+            print('hapiplotserver.plot(): Time for hapiplot() call = %f' % (time.time()-tic))
         if not img:
             message = "hapiplot.py cannot plot parameter " + parameters
             return errorimage(figsize, format, dpi, message), message

@@ -1,2 +1,2 @@
-http://127.0.0.1:5001/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&format=png&usecache=False
 http://127.0.0.1:5001/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&format=png&usecache=True
+http://127.0.0.1:5001/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&format=png&usecache=False

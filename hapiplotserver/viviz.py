@@ -63,8 +63,10 @@ def vivizconfig(server, dataset, **kwargs):
     for parameter in meta['parameters']:
         p = parameter['name']
         fulldir = "/?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&"
+        thumbdir = "/?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&dpi=72&"
         galleryc = gallery.copy()
         galleryc['fulldir'] = fulldir
+        galleryc['thumbdir'] = thumbdir
         galleryc['id'] = p
         galleryc['aboutlink'] = server + "/info?id=" + dataset
         galleries.append(galleryc)

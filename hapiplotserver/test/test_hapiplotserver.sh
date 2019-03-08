@@ -6,6 +6,8 @@ DIR=$(dirname "$0")/..
 echo "test_hapiplotserver.sh: Killing any running hapiplotserver listening on port 5001."
 pkill -f "hapiplotserver --port 5001"
 
+which hapiplotserver
+
 # Start server
 cmd="hapiplotserver --port 5001 --workers 4 --loglevel debug &"
 echo "test_hapiplotserver.sh: Starting server using $cmd"
@@ -14,7 +16,7 @@ eval $cmd
 PID=$!
 
 echo "test_hapiplotserver.sh: Sleeping for 2 seconds before running tests."
-sleep 2
+sleep 3
 
 echo "test_hapiplotserver.sh: Running tests."
 
@@ -37,6 +39,8 @@ do
 	#expect=${url%%;*}
 	echo "test_hapiplotserver.sh: Testing: $url"
 	curl -s $url > $TMPDIR/a.png
+	curl -s $url > ~/Desktop/a.png
+	#ls -lh $TMPDIR/a.png
 	if [[ "$(find $TMPDIR/a.png -maxdepth 1 -size +60k)" == "$TMPDIR/a.png" ]]; then
 		echo -e "test_hapiplotserver.sh: ${GREEN}PASS${NC}."
 	else

@@ -35,7 +35,10 @@ def hapiplotserver(**kwargs):
     conf = config(**kwargs)
     application = app(conf)
 
+    __version__ = "0.0.4"
+
     url = 'http://127.0.0.1:'+str(conf['port'])+"/"
+    print(' * hapiplotserver version ' + __version__)
     print(' * Starting server for ' + url)
     print(' * Using Python %d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2]))
     print(' * See ' + url + ' for API description.')
@@ -75,3 +78,8 @@ def gunicornx(**kwargs):
     application = app()
     application = config(application, **kwargs)
     return application
+
+
+
+
+

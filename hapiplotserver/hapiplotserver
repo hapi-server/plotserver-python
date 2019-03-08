@@ -4,9 +4,9 @@ desc="""
 Plot data from a HAPI server.
 
     List options and usage:
-        hapiplotserver.py -h
+        hapiplotserver -h
 
-Version: 0.0.3
+Version: 0.0.4
 """
 
 import sys
@@ -17,6 +17,20 @@ from hapiplotserver.main import hapiplotserver
 
 # Entry point for command line.
 if __name__ == "__main__":
+
+    # This is needed in order for test-virtualenv Makefile tests to work.
+    # Without it, urlrequest silently fails when 'make test-virtualenv' is run.
+    # However, if one does
+    #   source env/bin/activate
+    #   hapiplotserver --port 5001 --workers 4 --loglevel debug &
+    #   ... Execute failing curl request on command line
+    # the curl request works. So there is something about the Makefile environment
+    # that is screwing things up.
+    # TODO: When test_hapiplotserver.sh is converted to a python script, see if this is
+    # needed anymore.
+    if hasattr(sys, 'real_prefix'):
+        from hapiclient.util import urlopen
+        res = urlopen('http://google.com/')
 
     conf = config()
     parser = optparse.OptionParser(add_help_option=False)
@@ -45,6 +59,15 @@ if __name__ == "__main__":
             'workers': int(options.workers)
             }
     hapiplotserver(**opts)
+
+
+
+
+
+
+
+
+
 
 
 

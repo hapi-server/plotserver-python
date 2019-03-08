@@ -7,41 +7,43 @@ from hapiclient.util import urlopen
 
 from hapiplotserver.main import hapiplotserver
 
+# See note in hapiplotserver for why this is needed.
+if hasattr(sys, 'real_prefix'):
+    from hapiclient.util import urlopen
+    res = urlopen('http://google.com/')
+
 if True:
     from multiprocessing import Process
 
     print("test_hapiplotserver.py: Starting server.")
 
-    kwargs = {'port': 5002, 'workers': 4}
+    kwargs = {'port': 5003, 'workers': 4, 'loglevel': 'debug'}
     process = Process(target=hapiplotserver, kwargs=kwargs)
     process.start()
     print("test_hapiplotserver.py: Sleeping for 1 second while server starts.")
     time.sleep(1)
 
-    url = 'http://127.0.0.1:'+str(kwargs['port'])+'/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&format=gallery'
-    print(' * Opening in browser tab:')
-    print(' * ' + url)
-    webbrowser.open(url, new=2)
-    if sys.version_info[0] > 2:
-        input("Press Enter to continue.")
-    else:
-        raw_input("Press Enter to continue.")
-
     try:
-        if True:
 
-            url = 'http://127.0.0.1:'+str(kwargs['port'])+'/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=Time&time.min=1970-01-01Z&time.max=1970-01-02T00:00:00Z&format=png&usecache=False'
-            print("test_hapiplotserver.py: Making request")
+        if False:
+            url = 'http://127.0.0.1:' + str(kwargs['port']) + '/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=Time&time.min=1970-01-01Z&time.max=1970-01-02T00:00:00Z&format=png&usecache=False'
             img = urlopen(url)
-            process.terminate()
-            if len(img.read()) > 80000:
+            if len(img.read()) > 70000:
                 print("test_hapiplotserver.py: \033[0;32mPASS\033[0m")
-                sys.exit(0)
             else:
                 print("test_hapiplotserver.py: \033[0;31mFAIL\033[0m")
-                sys.exit(1)
-            #Image.open(urllib.request.urlopen(url)).show()
-        
+    
+        if True:
+            url = 'http://127.0.0.1:'+str(kwargs['port'])+'/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&format=gallery'
+            print(' * Opening in browser tab:')
+            print(' * ' + url)
+            webbrowser.open(url, new=2)
+            if False:
+                if sys.version_info[0] > 2:
+                    input("Press Enter to continue.")
+                else:
+                    raw_input("Press Enter to continue.")
+
         if False:
             url = 'http://127.0.0.1:'+str(kwargs['port'])+'/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&format=png&usecache=False'
             Image.open(urllib.request.urlopen(url)).show()

@@ -55,3 +55,18 @@ for fname in ("hapiplotserver/hapiplotserver",):
 	    fout.write(lines + "\n")
 	fout.close()    
 	print("Wrote " + fname + ".tmp")
+
+for fname in ("hapiplotserver/main.py",):
+	lines = ''
+	fin = open(fname)
+	#sys.stdout.write("Updating version in " + fname + ".")
+	for lineo in fin:
+		line = re.sub(r'__version__ = "(.*)"', r'__version__ = "' + version + '"', lineo)
+		updated = lineo != line
+		lines = lines + line
+	fin.close()
+	assert updated is False, "Problem updating version in " + fname + "."
+	with open(fname + ".tmp", "w") as fout:
+	    fout.write(lines + "\n")
+	fout.close()
+	print("Wrote " + fname + ".tmp")

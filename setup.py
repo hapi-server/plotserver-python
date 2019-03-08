@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys
 
-install_requires = ["Flask==1.0.2", "gunicorn==19.9.0", "matplotlib>=2.2.2", "hapiclient"]
+install_requires = ["hapiclient>=0.0.9","Flask==1.0.2", "gunicorn==19.9.0", "matplotlib>=2.2.2"]
 
 if len(sys.argv) > 1 and sys.argv[1] == 'develop':
     install_requires.append("Pillow")
@@ -9,7 +9,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'develop':
 # version is modified by misc/version.py. See Makefile.
 setup(
     name='hapiplotserver',
-    version='0.0.3',
+    version='0.0.4',
     author='Bob Weigel',
     author_email='rweigel@gmu.edu',
     packages=find_packages(),
@@ -21,6 +21,15 @@ setup(
     include_package_data=True,
     scripts=["hapiplotserver/hapiplotserver"] 
 )
+
+
+
+
+
+
+
+
+
 
 
 

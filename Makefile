@@ -19,37 +19,39 @@ URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.3
+VERSION=0.0.4
 SHELL:= /bin/bash
 
 test:
-	make test-repository
+    make test-virtualenv PYTHON=python3.6
+    make test-virtualenv PYTHON=python2.7
+	make test-repository PYTHON=python3.6
+    make test-repository PYTHON=python2.7
 
 test-repository:
-	make test-commandline PYTHON=python3.6
-	make test-commandline PYTHON=python2.7
 	- rm -rf $(TMPDIR)/hapi-data
-	make test-script PYTHON=python3.6
-	- rm -rf $(TMPDIR)/hapi-data
-	make test-script PYTHON=python2.7
-
-test-commandline:
+	pip uninstall -y -q hapiplotserver
 	$(PYTHON) setup.py develop
-	bash hapiplotserver/test/test_hapiplotserver.sh 
-
-test-script:
+	bash hapiplotserver/test/test_hapiplotserver.sh  # TODO: Need to pass $(PYTHON) to script.
+	- rm -rf $(TMPDIR)/hapi-data
+	pip uninstall -y -q hapiplotserver
 	$(PYTHON) setup.py develop
 	$(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
-test-old:
-	read -p "Press enter to continue tests."
-	cd hapiplotserver; \
-		gunicorn -w 4 -b 127.0.0.1:5000 'server:gunicorn(loglevel="debug",use_cache=False)' &
-	read -p "Press enter to continue tests."
-	echo("Open and check http://127.0.0.1:5000/")
+test-virtualenv:
+	rm -rf env
+	$(PYTHON) -m virtualenv env
+	source env/bin/activate && \
+	    pip install pytest && \
+        pip install . && \
+        pip install ../client-python
+	source env/bin/activate && \
+	    bash hapiplotserver/test/test_hapiplotserver.sh
+	source env/bin/activate && \
+	    python hapiplotserver/test/test_hapiplotserver.py
 
 package:
-	make clean
+	make clean	
 	make version-update
 	python setup.py sdist
 	#make test-package PYTHON=python3.6
@@ -63,12 +65,10 @@ test-package:
 		pip install dist/hapiplotserver-$(VERSION).tar.gz \
 			--index-url $(URL)/simple \
 			--extra-index-url https://pypi.org/simple
-
-# Does not work. 
-#	source env/bin/activate && \
-#		$(PYTHON) env/lib/$(PYTHON)/site-packages/hapiplotserver/test/test_hapiplotserver.py
-
-#		bash env/lib/$(PYTHON)/site-packages/hapiplotserver/test/test_hapiplotserver.sh 
+	source env/bin/activate && \
+	    bash hapiplotserver/test/test_hapiplotserver.sh
+	source env/bin/activate && \
+	    python hapiplotserver/test/test_hapiplotserver.py
 
 test-release:
 	rm -rf env
@@ -81,6 +81,7 @@ test-release:
 				
 release:
 	make version-tag
+	make package
 	make release-upload
 
 release-upload: 
@@ -96,6 +97,7 @@ version-update:
 	python misc/version.py
 	mv setup.py.tmp setup.py
 	mv hapiplotserver/hapiplotserver.tmp hapiplotserver/hapiplotserver
+	mv hapiplotserver/main.py.tmp hapiplotserver/main.py
 	mv Makefile.tmp Makefile
 
 version-tag:
@@ -128,6 +130,14 @@ clean:
 	- rm -f MANIFEST
 	- rm -rf .pytest_cache/
 	- rm -rf *.egg-info/
+
+
+
+
+
+
+
+
 
 
 
