@@ -84,13 +84,12 @@ release:
 	make package
 	make release-upload
 
-release-upload: 
-	twine upload \
+release-upload:
+    twine upload \
 		-r $(REP) dist/hapiplotserver-$(VERSION).tar.gz \
 		--config-file misc/pypirc \
 		&& \
 	echo Uploaded to $(subst upload.,,$(URL))/project/hapiplotserver/
-
 
 # Update version based on content of CHANGES.txt
 version-update:
@@ -130,6 +129,7 @@ clean:
 	- rm -f MANIFEST
 	- rm -rf .pytest_cache/
 	- rm -rf *.egg-info/
+
 
 
 
