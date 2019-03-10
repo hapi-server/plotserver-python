@@ -12,6 +12,8 @@
 #    (Will fail unti new version is available at pypi.org for pip install. 
 #     Sometimes takes ~5 minutes even though web page is immediately
 #     updated.)
+# 4. After package is finalized, create new version number in CHANGES.txt ending
+#    with "b0" in setup.py and then run make version-update.
 
 PYTHON=python3.6
 
@@ -19,7 +21,7 @@ URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.4
+VERSION=0.0.5-beta
 SHELL:= /bin/bash
 
 test:
@@ -78,17 +80,15 @@ test-release:
 		pip install 'hapiplotserver==$(VERSION)' \
 			--index-url $(URL)/simple  \
 			--extra-index-url https://pypi.org/simple 
-				
+
 release:
 	make version-tag
 	make package
 	make release-upload
 
 release-upload:
-    twine upload \
-		-r $(REP) dist/hapiplotserver-$(VERSION).tar.gz \
-		--config-file misc/pypirc \
-		&& \
+	echo "rweigel, t1p"
+	twine upload -r $(REP) dist/hapiplotserver-$(VERSION).tar.gz --config-file misc/pypirc
 	echo Uploaded to $(subst upload.,,$(URL))/project/hapiplotserver/
 
 # Update version based on content of CHANGES.txt
@@ -129,6 +129,7 @@ clean:
 	- rm -f MANIFEST
 	- rm -rf .pytest_cache/
 	- rm -rf *.egg-info/
+
 
 
 

@@ -6,7 +6,7 @@ Plot data from a HAPI server.
     List options and usage:
         hapiplotserver -h
 
-Version: 0.0.4
+Version: 0.0.5-beta
 """
 
 import sys
@@ -59,6 +59,7 @@ if __name__ == "__main__":
             'workers': int(options.workers)
             }
     hapiplotserver(**opts)
+
 
 
 

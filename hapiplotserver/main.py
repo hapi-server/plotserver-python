@@ -35,7 +35,7 @@ def hapiplotserver(**kwargs):
     conf = config(**kwargs)
     application = app(conf)
 
-    __version__ = "0.0.4"
+    __version__ = "0.0.5-beta"
 
     url = 'http://127.0.0.1:'+str(conf['port'])+"/"
     print(' * hapiplotserver version ' + __version__)
@@ -78,6 +78,7 @@ def gunicornx(**kwargs):
     application = app()
     application = config(application, **kwargs)
     return application
+
 
 
 
