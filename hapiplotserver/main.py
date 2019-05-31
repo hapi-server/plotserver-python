@@ -35,7 +35,7 @@ def hapiplotserver(**kwargs):
     conf = config(**kwargs)
     application = app(conf)
 
-    __version__ = "0.0.5-beta"
+    __version__ = "0.0.5b0"
 
     url = 'http://127.0.0.1:'+str(conf['port'])+"/"
     print(' * hapiplotserver version ' + __version__)
@@ -47,6 +47,9 @@ def hapiplotserver(**kwargs):
     if conf['workers'] == 0:
         application.run(port=conf['port'], threaded=conf['threaded'])
     else:
+        from sys import platform
+        if platform == "darwin" and sys.version_info < (3, 6):
+            raise Exception('On OS-X, Python 3.6+ is needed if workers > 0. (A bug in system URL libraries prevents some URL reads from working with gunicorn.)')
         gunicorn(application, port=conf['port'], workers=conf['workers'])
 
 
@@ -78,10 +81,3 @@ def gunicornx(**kwargs):
     application = app()
     application = config(application, **kwargs)
     return application
-
-
-
-
-
-
-
