@@ -9,7 +9,7 @@ pkill -f "hapiplotserver --port 5001"
 which hapiplotserver
 
 # Start server
-cmd="hapiplotserver --port 5001 --workers 4 --loglevel debug &"
+cmd="hapiplotserver --port 5001 --workers 2 --loglevel debug &"
 echo "test_hapiplotserver.sh: Starting server using $cmd"
 eval $cmd
 
