@@ -10,7 +10,7 @@ Installation and Startup
 
 .. code:: bash
 
-    pip install hapiplotserver
+    pip install hapiplotserver --upgrade
     hapiplotserver --port 5999
 
 then see http://localhost:5999/ for documentation.
