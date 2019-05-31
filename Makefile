@@ -9,19 +9,19 @@
 # 1. make release
 # 2. Wait ~5 minutes and execute
 # 3. make test-release
-#    (Will fail unti new version is available at pypi.org for pip install. 
+#    (Will fail until new version is available at pypi.org for pip install.
 #     Sometimes takes ~5 minutes even though web page is immediately
 #     updated.)
 # 4. After package is finalized, create new version number in CHANGES.txt ending
 #    with "b0" in setup.py and then run make version-update.
 
-PYTHON=python3.6
+PYTHON=python3.5
 
 URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.5-beta
+VERSION=0.0.5b0
 SHELL:= /bin/bash
 
 test:
@@ -32,13 +32,14 @@ test:
 
 test-repository:
 	- rm -rf $(TMPDIR)/hapi-data
-	pip uninstall -y -q hapiplotserver
-	$(PYTHON) setup.py develop
-	bash hapiplotserver/test/test_hapiplotserver.sh  # TODO: Need to pass $(PYTHON) to script.
-	- rm -rf $(TMPDIR)/hapi-data
-	pip uninstall -y -q hapiplotserver
-	$(PYTHON) setup.py develop
-	$(PYTHON) hapiplotserver/test/test_hapiplotserver.py
+	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
+	source activate $(PYTHON); $(PYTHON) setup.py develop
+	source activate $(PYTHON); bash hapiplotserver/test/test_hapiplotserver.sh
+
+zz:
+	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
+	source activate $(PYTHON); $(PYTHON) setup.py develop
+	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
 test-virtualenv:
 	rm -rf env
@@ -53,7 +54,7 @@ test-virtualenv:
 	    python hapiplotserver/test/test_hapiplotserver.py
 
 package:
-	make clean	
+	make clean
 	make version-update
 	python setup.py sdist
 	#make test-package PYTHON=python3.6
@@ -82,8 +83,8 @@ test-release:
 			--extra-index-url https://pypi.org/simple 
 
 release:
-	make version-tag
 	make package
+	make version-tag
 	make release-upload
 
 release-upload:
@@ -129,32 +130,3 @@ clean:
 	- rm -f MANIFEST
 	- rm -rf .pytest_cache/
 	- rm -rf *.egg-info/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
