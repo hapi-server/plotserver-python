@@ -6,11 +6,11 @@ def prepviviz(server, dataset, **kwargs):
 
     if not os.path.exists(vivizdir):
         if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.app(): Downloading ViViz to ' + kwargs['cachedir'])
+            print('hapiplotserver.viviz(): Downloading ViViz to ' + kwargs['cachedir'])
         getviviz(**kwargs)
     else:
         if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.app(): Found ViViz at ' + vivizdir)
+            print('hapiplotserver.viviz(): Found ViViz at ' + vivizdir)
 
     vivizconfig(server, dataset, **kwargs)
 
@@ -62,8 +62,8 @@ def vivizconfig(server, dataset, **kwargs):
     galleries = []
     for parameter in meta['parameters']:
         p = parameter['name']
-        fulldir = "/?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&"
-        thumbdir = "/?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&dpi=72&"
+        fulldir = "../?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&"
+        thumbdir = "../?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&dpi=72&"
         galleryc = gallery.copy()
         galleryc['fulldir'] = fulldir
         galleryc['thumbdir'] = thumbdir

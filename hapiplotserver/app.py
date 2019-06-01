@@ -6,7 +6,7 @@ from hapiplotserver.viviz import prepviviz
 
 def app(conf):
 
-    from flask import Flask, request, redirect, send_from_directory
+    from flask import Flask, request, redirect, send_from_directory, url_for
     application = Flask(__name__)
 
     loglevel = conf['loglevel']
@@ -126,7 +126,8 @@ def app(conf):
 
         if format == 'gallery':
             prepviviz(server, dataset, **conf)
-            return redirect("viviz#catalog="+server + id, code=302)
+            url = url_for("viviz", _external=True)
+            return redirect(url+"#catalog="+server + id, code=302)
 
         # Plot options
         opts = {'cachedir': cachedir, 'usecache': usecache, 'loglevel': loglevel, 'format': format, 'figsize': figsize, 'dpi': dpi, 'transparent': transparent}
@@ -140,20 +141,24 @@ def app(conf):
 
         return img[0], 200, ct
 
-    @application.route("/viviz")
-    def vivizx():
-        return redirect("viviz/", code=301)
+    # ../? in fuldir and thumbdir in viviz.py
+    # return = url + "#catalog=..." and url = url_for("viviz", _external=True)
+    # in format == 'gallery'
 
+    # Serve index.htm for /viviz/ request
     @application.route("/viviz/")
     def viviz():
         return send_from_directory(cachedir+"/viviz", "index.htm")
 
-    @application.route('/<path:path>')
-    def static_proxy(path):
-        # Force these files to not be cached by browser.
-        if path == 'viviz/index.js' or '.json' in path:
-            return send_from_directory(cachedir, path, cache_timeout=0)
+    # Serve static files
+    @application.route("/viviz/"+"<path:filename>")
+    def vivizf(filename):
+        print(filename)
+        if filename == 'index.js' or '.json' in filename:
+            # Force these files to not be cached by browser.
+            print("Setting cache_timeout = 0 for " + filename)
+            return send_from_directory(cachedir+"/viviz", filename, cache_timeout=0)
         else:
-            return send_from_directory(cachedir, path)
+            return send_from_directory(cachedir+"/viviz", filename)
 
     return application
