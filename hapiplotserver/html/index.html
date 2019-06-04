@@ -1,46 +1,68 @@
-<html>
+<!DOCTYPE html>
+<html lang="text/html">
 	<head>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 		<title>HAPI Plot Server</title>
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 		<link rel="icon" href="favicon.ico" type="image/x-icon">
-	</head>
-  	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-	<script>
-	var exampleURLs = [
-		"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=false&usecache=False",
-		"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=false&usecache=True",
-		"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=true&usecache=False",
-		"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=true&usecache=True",
-		"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&format=gallery"
-		];
+		<style>
+			h1 { font-size: 130%; }
+		</style>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+		<script>
+			var exampleImageURLs =
+				[
+					"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=false&usecache=False",
+					"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=false&usecache=True",
+					"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=true&usecache=False",
+					"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=true&usecache=True"
+				];
+			var exampleGalleryURLs =
+				[
+					"server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&format=gallery",
+					"server=http://hapi-server.org/servers/TestData/hapi&format=gallery",
+					"server=http://hapi-server.org/servers/SSCWeb/hapi&id=ace&format=gallery",
+					"server=http://hapi-server.org/servers/SSCWeb/hapi&format=gallery",
+					"server=http://planet.physics.uiowa.edu/das/das2Server/hapi&format=gallery",
+					"server=http://datashop.elasticbeanstalk.com/hapi&format=gallery"
+				];
 
-	$(document).ready(function(){
-		var exampleul = $('#examples');
-		$.each(exampleURLs, function(i)
-			{
-				var li = $('<li>').appendTo(exampleul);
-				var a  = $('<a>')
-							.attr("href","?" + exampleURLs[i])
-							.text("?" + exampleURLs[i])
-							.appendTo(li);
-			});
-	})
+			$(document).ready(function(){
+				var exampleul = $('#exampleImageURLs');
+				$.each(exampleImageURLs, function(i)
+					{
+						var li = $('<li>').appendTo(exampleul);
+						var a  = $('<a>')
+									.attr("href","?" + exampleImageURLs[i])
+									.text("?" + exampleImageURLs[i])
+									.appendTo(li);
+					});
+
+				var exampleul = $('#exampleGalleryURLs');
+				$.each(exampleGalleryURLs, function(i)
+					{
+						var li = $('<li>').appendTo(exampleul);
+						var a  = $('<a>')
+									.attr("href","?" + exampleGalleryURLs[i])
+									.text("?" + exampleGalleryURLs[i])
+									.appendTo(li);
+					});
+			})
 	</script>
+	</head>
 	<body>
-		<p>
-			Plot data from a HAPI server using the <code>hapiplot</code> function in <a href="http://github.com/hapi-server/client-python">hapiclient</a>
-		</p>
-		<p>
-			Source: <a href="http://github.com/hapi-server/plotserver-python">http://github.com/hapi-server/plotserver-python</a>
-		</p>
-		<h3>Parameters</h3>
-		<p>
+		<h1>About</h1>
+			<p>
+				Plot data from a HAPI server using the <code>hapiplot</code> function in <a href="http://github.com/hapi-server/client-python">hapiclient</a>
+			</p>
+			<p>
+				Source: <a href="http://github.com/hapi-server/plotserver-python">http://github.com/hapi-server/plotserver-python</a>
+			</p>
+		<h1>Parameters</h1>
 			<ul>
 				<li><code>server</code> A URL to a HAPI server (must end in <code>/hapi</code>)</li>
 				<li><code>id</code> A dataset ID</li>
-				<li><code>parameters</code> A parameter in the dataset. At present, <code>PARAMETERS
-			</code> can only be a single parameter</li>
+				<li><code>parameters</code> A parameter in the dataset. At present, <code>PARAMETERS</code> can only be a single parameter</li>
 				<li><code>time.min</code> Start time for plot</li>
 				<li><code>time.max</code> End time for plot</li>
 				<li><code>format</code> [<code>png</code>], <code>svg</code>, <code>pdf</code>, or <code>gallery</code></li>
@@ -49,26 +71,43 @@
 				<li><code>figsize</code> [<code>7,3</code>] image size in inches</li>
 				<li><code>dpi</code> [<code>144</code>] dpi of image (ignored if <code>format</code> is not <code>png</code>)</li>
 			</ul>
-		<h3>Usage</h3>
-		<h4><code>format</code> = <code>png</code>, <code>svg</code>, and <code>pdf</code></h4>
-		<p>
-			Returns an image of <code>PARAMETERS</code> in dataset <code>ID</code> plotted over the timerange <code>START/STOP</code>.
-		</p>
-		<p>
-			<code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&time.max=START&time.min=STOP</code> 
-		</p>
-		<h4><code>format</code> = <code>gallery</code></h4>
-		<p>
+		<h1>Usage with <code>format</code> = <code>png</code>, <code>svg</code>, and <code>pdf</code></h1>
+			<p>
+				Returns an image of <code>PARAMETERS</code> in dataset <code>ID</code> plotted over the timerange <code>START/STOP</code>.
+			</p>
+			<p>
+				<code>id</code>, <code>parameters</code>, <code>time.min</code>, and <code>time.max</code> are required.
+			</p>
+			<p>
+				Usage
+			</p>
 			<ul>
+				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&time.max=START&time.min=STOP</code></li>
+			</ul>
+			<p>Examples</p>
+			<ul id="exampleImageURLs"></ul>
+		<h1>Usage with <code>format</code> = <code>gallery</code></h1>
+			<p>
+				Generates a <a href="http://viviz.org/">ViViz</a> image gallery.
+			</p>
+			<p>
+				If only <code>server</code> is given, ViViz menu options allow viewing of all datasets and parameters over full range of available data.
+			</p>
+			<ul>
+				<li>If <code>id</code> is not given, image gallery drop-down includes all datesets.</li>
+				<li>If <code>parameters</code> is not given, drop-down includes all parameters.</li>
+				<li><code>time.min</code> and/or <code>time.max</code> can be specified to constrain time range of images that can be viewed from default of full time range of available data.</li>
+			</ul>
+			<p>
+				Usage
+			</p>
+			<ul>
+				<li><code>?server=HAPIURL&format=gallery</code></li>
 				<li><code>?server=HAPIURL&id=ID&format=gallery</code></li>
-				<li><code>?server=HAPIURL&id=ID&&amp;parameters=PARAMETERS&format=gallery</code></li>
-				<li><code>?server=HAPIURL&id=ID&&amp;parameters=PARAMETERS&time.max=START&time.min=STOP&format=gallery</code></li>
+				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&format=gallery</code></li>
+				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&time.max=START&time.min=STOP&format=gallery</code></li>
 			</ul>
-		</p>
-		<h3>Examples</h3>
-		<p>
-			<ul id="examples">
-			</ul>
-		</p>
+			<p>Examples</p>
+			<ul id="exampleGalleryURLs"></ul>
 	</body>
 </html>
