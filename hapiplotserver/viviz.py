@@ -67,15 +67,22 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
     indexjs = kwargs['cachedir'] + '/' + indexjs_rel
     indexjso = kwargs['cachedir'] + '/viviz/index.js'
     shutil.copyfile(indexjso, indexjs)
+    print('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexjs)
 
     indexhtm = kwargs['cachedir'] + '/viviz/index-' + slug + '.htm'
     indexhtmo = kwargs['cachedir'] + '/viviz/index.htm'
     shutil.copyfile(indexhtmo, indexhtm)
+    print('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexhtm)
 
     fid = hashlib.md5(bytes(slug, 'utf8')).hexdigest()
+    indexhtm_hash = kwargs['cachedir'] + '/viviz/' + fid[0:4]
+    if os.path.isfile(indexhtm_hash):
+        os.remove(indexhtm_hash)
+        print('hapiplotserver.viviz.vivizconfig(): Removed existing %s' % indexhtm_hash)
+
+    print('hapiplotserver.viviz.vivizconfig(): Symlinking %s with %s' % (indexhtm, indexhtm_hash))
+    os.symlink(indexhtm, indexhtm_hash)
     indexhtm_hash = fid[0:4]
-    if not os.path.isfile(indexhtm_hash):
-        os.symlink(indexhtm, indexhtm_hash)
 
     indexjs_rel = 'index-' + slug + '.js'
     with open(indexhtm) as f:
@@ -126,7 +133,7 @@ def adddataset(server, dataset, indexjs, **kwargs):
         os.makedirs(dname)
 
     if kwargs['loglevel'] == 'debug':
-        print('hapiplotserver.catalog(): Appending to ' + indexjs)
+        print('hapiplotserver.viviz.adddataset(): Appending to ' + indexjs)
 
     with open(indexjs, 'a') as f:
         f.write('\nVIVIZ["config"]["catalogs"]["%s/%s"] = {};\n' % (server, dataset))
@@ -136,7 +143,7 @@ def adddataset(server, dataset, indexjs, **kwargs):
 
     if False and os.path.exists(catalogabs):
         if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.catalog(): Using cached ' + catalogabs)
+            print('hapiplotserver.viviz.adddataset(): Using cached ' + catalogabs)
         return
 
     meta = hapi(server, dataset)
@@ -178,7 +185,7 @@ def adddataset(server, dataset, indexjs, **kwargs):
         galleries.append(galleryc)
 
     if kwargs['loglevel'] == 'debug':
-        print('hapiplotserver.catalog(): Writing ' + catalogabs)
+        print('hapiplotserver.viviz.vivizconfig(): Writing ' + catalogabs)
 
     with open(catalogabs, 'w') as f:
         json.dump(galleries, f, indent=4)

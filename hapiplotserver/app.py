@@ -119,7 +119,7 @@ def app(conf):
             # Get full URL
             url = url_for("viviz", _external=True)
             red = url + indexhtm + "#" + vivizhash
-            print("Redirecting to " + red)
+            print("hapiplotserver.app.main(): Redirecting to " + red)
             return redirect(red, code=302)
 
         # Plot options
