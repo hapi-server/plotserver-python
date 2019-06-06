@@ -51,7 +51,7 @@
 	</script>
 	</head>
 	<body>
-		<code>hapiplotserver-__version__</code>
+		<code>hapiplotserver-0.0.5b2</code>
 		<h1>About</h1>
 			<p>
 				Plot data from a HAPI server using the <code>hapiplot</code> function in <a href="http://github.com/hapi-server/client-python">hapiclient</a>
@@ -68,7 +68,8 @@
 				<li><code>time.max</code> End time for plot</li>
 				<li><code>format</code> [<code>png</code>], <code>svg</code>, <code>pdf</code>, or <code>gallery</code></li>
 				<li><code>transparent</code> [<code>true</code>] or <code>false</code> Make background transparent (results in smaller png files)</li>
-				<li><code>usecache</code> [<code>true</code>] or <code>false</code> If true, serve cached image if available</li>
+				<li><code>usedatacache</code> [<code>true</code>] or <code>false</code> If true, use cached data if available</li>
+				<li><code>usecache</code> [<code>true</code>] or <code>false</code> If true and usedatacache=true, serve cached image if available</li>
 				<li><code>figsize</code> [<code>7,3</code>] image size in inches</li>
 				<li><code>dpi</code> [<code>144</code>] dpi of image (ignored if <code>format</code> is not <code>png</code>)</li>
 			</ul>

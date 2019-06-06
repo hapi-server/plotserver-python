@@ -11,8 +11,25 @@ def app(conf):
 
     loglevel = conf['loglevel']
     cachedir = conf['cachedir']
-    server_usecache = conf['usecache']
     appdir = os.path.abspath(os.path.dirname(__file__))
+
+    def cacheopts(cachestr):
+        usecache = request.args.get(cachestr)
+        if usecache is None:
+            usecache = True
+        elif usecache.lower() == "true":
+            usecache = True
+        elif usecache.lower() == "false":
+            usecache = False
+        else:
+            return cachestr + ' must be true or false', 400, {'Content-Type': 'text/html'}
+
+        if conf[cachestr] is False and usecache is True:
+            usecache = False
+            if loglevel == 'debug':
+                print('app(): Application configuration has ' + cachestr + '=False so request to use cache is ignored.')
+
+        return usecache
 
     @application.route("/favicon.ico")
     def favicon():
@@ -73,24 +90,15 @@ def app(conf):
                     return 'Could not get metadata from ' + server, 400, {'Content-Type': 'text/html'}
             stop = meta['stopDate']
 
-        usecache = request.args.get('usecache')
-        if usecache is None:
-            usecache = True
-        elif usecache.lower() == "true":
-            usecache = True
-        elif usecache.lower() == "false":
-            usecache = False
-        else:
-            return 'usecache must be true or false', 400, {'Content-Type': 'text/html'}
+        usecache = cacheopts('usecache')
+        usedatacache = cacheopts('usedatacache')
 
-        if server_usecache is False and usecache is True:
+        if usedatacache is False:
             usecache = False
-            if loglevel == 'debug':
-                print('app(): Application configuration has usecache=False so request to use cache is ignored.')
 
         transparent = request.args.get('transparent')
         if transparent is None:
-            transparent = True
+            transparent = conf['transparent']
         elif transparent.lower() == "true":
             transparent = True
         elif transparent.lower() == "false":
@@ -100,7 +108,7 @@ def app(conf):
 
         dpi = request.args.get('dpi')
         if dpi is None:
-            dpi = 300
+            dpi = conf['dpi']
         else:
             dpi = int(dpi)
             if dpi > 1200 or dpi < 1:
@@ -108,7 +116,7 @@ def app(conf):
 
         figsize = request.args.get('figsize')
         if figsize is None:
-            figsize = (7, 3)
+            figsize = conf['figsize']
         else:
             figsizearr = figsize.split(',')
             figsize = (float(figsizearr[0]), float(figsizearr[1]))
@@ -122,8 +130,8 @@ def app(conf):
             print("hapiplotserver.app.main(): Redirecting to " + red)
             return redirect(red, code=302)
 
-        # Plot options
-        opts = {'cachedir': cachedir, 'usecache': usecache, 'loglevel': loglevel, 'format': format, 'figsize': figsize, 'dpi': dpi, 'transparent': transparent}
+        # Plot function options
+        opts = {'cachedir': cachedir, 'usecache': usecache, 'usedatacache': usedatacache, 'loglevel': loglevel, 'format': format, 'figsize': figsize, 'dpi': dpi, 'transparent': transparent}
 
         img = plot(server, dataset, parameters, start, stop,  **opts)
 

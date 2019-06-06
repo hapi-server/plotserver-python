@@ -24,8 +24,8 @@ version = version.rstrip()
 print("Using version = " + version)
 
 fnames = ["Makefile","setup.py", "hapiplotserver/main.py", "hapiplotserver/hapiplotserver", "hapiplotserver/html/index.html"]
-regexes = ["VERSION=(.*)","version=(.*)","__version__ = (.*)", "Version: (.*)", "<code>hapiplotserver-0.0.5b2</code>"]
-replaces = ["VERSION=" + version, "version='" + version + "'", "__version__ = '" + version + "'", "Version: " + version, "<code>hapiplotserver-" + version + "</code>"]
+regexes = ["VERSION=(.*)","version=(.*)","__version__ = (.*)", "Version: (.*)", "<code>hapiplotserver-(.*)</code>"]
+replaces = ["VERSION=" + version, "version='" + version + "',", "__version__ = '" + version + "'", "Version: " + version, "<code>hapiplotserver-" + version + "</code>"]
 for i in range(len(fnames)):
 	updated = False
 	is_up_to_date = False

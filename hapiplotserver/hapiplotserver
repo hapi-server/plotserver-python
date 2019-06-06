@@ -6,7 +6,7 @@ Plot data from a HAPI server.
     List options and usage:
         hapiplotserver -h
 
-Version: 0.0.5b0
+Version: 0.0.5b2
 """
 
 import sys
@@ -41,7 +41,8 @@ if __name__ == "__main__":
     parser.add_option("--cachedir", help="Cache directory " + "[%s]" % conf['cachedir'], default=conf['cachedir'])
     parser.add_option("--loglevel", help="Log level " + "(error, default, debug) [%s]" % conf['loglevel'], default=conf['loglevel'])
     parser.add_option("--threaded", type="int", help="Run each request in separate thread (0=no or 1=yes) " + "[%s]" % int(conf['threaded']), default=int(conf['threaded']))
-    parser.add_option("--usecache", type="int", help="Use cached data and images (0=no or 1=yes) " + "[%s]" % int(conf['usecache']), default=int(conf['usecache']))
+    parser.add_option("--usedatacache", type="int", help="Use cached data (0=no or 1=yes) " + "[%s]" % int(conf['usedatacache']), default=int(conf['usedatacache']))
+    parser.add_option("--usecache", type="int", help="Use cached images (0=no or 1=yes) " + "[%s]" % int(conf['usecache']), default=int(conf['usecache']))
     parser.add_option("--workers", type="int", help="# of Gunicorn workers. If > 0, Gunicorn is used and 'threaded' option ignored. " + "[%s]" % int(conf['workers']), default=int(conf['workers']))
 
     (options, args) = parser.parse_args()

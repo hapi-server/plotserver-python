@@ -21,7 +21,7 @@ URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.5b1
+VERSION=0.0.5b2
 SHELL:= /bin/bash
 
 test:
@@ -95,10 +95,6 @@ release-upload:
 # Update version based on content of CHANGES.txt
 version-update:
 	python misc/version.py
-	mv setup.py.tmp setup.py
-	mv hapiplotserver/html/index.html.tmp hapiplotserver/html/index.html.tmp
-	mv hapiplotserver/main.py.tmp hapiplotserver/main.py
-	mv Makefile.tmp Makefile
 
 version-tag:
 	git commit -a -m "Last $(VERSION) commit"

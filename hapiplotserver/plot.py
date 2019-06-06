@@ -43,41 +43,33 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
     import traceback
     import time
 
-    cachedir = kwargs['cachedir'] if 'cachedir' in kwargs else CACHEDIR
-    usecache = kwargs['usecache'] if 'usecache' in kwargs else USECACHE
-    loglevel = kwargs['loglevel'] if 'loglevel' in kwargs else LOGLEVEL
-    figsize = kwargs['figsize'] if 'figsize' in kwargs else (7, 3)
-    format = kwargs['format'] if 'format' in kwargs else 'png'
-    dpi = kwargs['dpi'] if 'dpi' in kwargs else 144
-    transparent = kwargs['transparent'] if 'transparent' in kwargs else False
-
     logging = False
-    if loglevel == 'debug': logging = True
+    if kwargs['loglevel'] == 'debug': logging = True
 
     try:
         tic = time.time()
         opts = {'logging': logging,
-                'cachedir': cachedir,
-                'usecache': usecache
+                'cachedir': kwargs['cachedir'],
+                'usecache':  kwargs['usedatacache']
                 }
         data, meta = hapi(server, dataset, parameters, start, stop, **opts)
-        if loglevel == 'debug': print('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
+        if kwargs['loglevel'] == 'debug': print('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
     except Exception as e:
         print(traceback.format_exc())
         message = traceback.format_exc().split('\n')
-        return errorimage(figsize, format, dpi, message), message
+        return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)
 
     try:
         tic = time.time()
         popts = {'logging': logging,
-                 'cachedir': cachedir,
+                 'cachedir': kwargs['cachedir'],
                  'returnimage': True,
-                 'usecache': usecache,
+                 'useimagecache': kwargs['usecache'],
                  'saveimage': True,
-                 'rcParams': {'savefig.transparent': transparent,
-                              'savefig.format': format,
-                              'savefig.dpi': dpi,
-                              'figure.figsize': figsize
+                 'rcParams': {'savefig.transparent': kwargs['transparent'],
+                              'savefig.format': kwargs['format'],
+                              'savefig.dpi': kwargs['dpi'],
+                              'figure.figsize': kwargs['figsize']
                               }
                  }
 
@@ -85,14 +77,14 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
         pn = -1 + len(meta['parameters'])
         img = meta['parameters'][pn]['hapiplot']['image']
 
-        if loglevel == 'debug':
+        if kwargs['loglevel'] == 'debug':
             print('hapiplotserver.plot(): Time for hapiplot() call = %f' % (time.time()-tic))
         if not img:
             message = "hapiplot.py cannot plot parameter " + parameters
-            return errorimage(figsize, format, dpi, message), message
+            return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)
         else:
             return img, None
     except Exception as e:
         print(traceback.format_exc())
         message = traceback.format_exc().split('\n')
-        return errorimage(figsize, format, dpi, message), message
+        return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)
