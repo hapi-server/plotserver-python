@@ -6,7 +6,10 @@ TODO: Find better way to manage this.
 TODO: Update copyright year in LICENSE.txt
 """
 
+import os
 import re
+
+overwrite = True
 
 # Get last version in CHANGES.txt
 print("Finding version information from CHANGES.txt")
@@ -20,43 +23,33 @@ fin.close()
 version = version.rstrip()
 print("Using version = " + version)
 
-lines = ''
-fin = open("Makefile")
-for lineo in fin:
-	line = re.sub(r"VERSION=(.*)", r"VERSION=" + version, lineo)
-	updated = lineo != line
-	lines = lines + line
-fin.close()
-assert updated is False, "Problem updating version in Makefile."
-with open("Makefile.tmp", "w") as fout:
-	fout.write(lines)
-fout.close()
-print("Wrote Makefile.tmp")
+fnames = ["Makefile","setup.py", "hapiplotserver/main.py", "hapiplotserver/hapiplotserver", "hapiplotserver/html/index.html"]
+regexes = ["VERSION=(.*)","version=(.*)","__version__ = (.*)", "Version: (.*)", "<code>hapiplotserver-0.0.5b2</code>"]
+replaces = ["VERSION=" + version, "version='" + version + "'", "__version__ = '" + version + "'", "Version: " + version, "<code>hapiplotserver-" + version + "</code>"]
+for i in range(len(fnames)):
+	updated = False
+	is_up_to_date = False
 
-lines = ''
-fin = open("setup.py")
-for lineo in fin:
-	line = re.sub(r"version=(.*),", r"version='" + version + "',", lineo)
-	updated = lineo != line
-	lines = lines + line
-fin.close()
-assert updated is False, "Problem updating version in setup.py."
-with open("setup.py.tmp", "w") as fout:
-	fout.write(lines)
-fout.close()
-print("Wrote setup.py.tmp")
-
-for fname in ("hapiplotserver/main.py", "hapiplotserver/html/index.html"):
 	lines = ''
-	fin = open(fname)
+	fin = open(fnames[i])
+	print("Scanning " + fnames[i])
 	for lineo in fin:
-		line1 = re.sub(r"__version__ = '(.*)'", r"__version__ = '" + version + "'", lineo)
-		updated1 = lineo != line1
+		line1 = re.sub(regexes[i], replaces[i], lineo)
+		if re.search(regexes[i], lineo):
+			is_up_to_date = True
+		if lineo != line1:
+			print("Original: " + lineo.rstrip())
+			print("Modified: " + line1.rstrip())
+			updated = True
 		lines = lines + line1
 	fin.close()
-	assert updated1 is False or updated2 is False, \
-		"Problem updating version in " + fname + "."
-	with open(fname + ".tmp", "w") as fout:
+	if is_up_to_date:
+		print("  Version in file was already up-to-date.")
+	errstr = "Problem updating line with %s in %s." % (regexes[i], fnames[i])
+	assert updated is True or is_up_to_date is True, errstr
+	with open(fnames[i] + ".tmp", "w") as fout:
 		fout.write(lines)
-	fout.close()    
-	print("Wrote " + fname + ".tmp")
+	print("Wrote " + fnames[i] + ".tmp")
+	if overwrite:
+		os.rename(fnames[i] + ".tmp", fnames[i])
+		print("  Renamed " + fnames[i] + ".tmp" + " to " + fnames[i])
