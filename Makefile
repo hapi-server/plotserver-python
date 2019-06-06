@@ -15,13 +15,13 @@
 # 4. After package is finalized, create new version number in CHANGES.txt ending
 #    with "b0" in setup.py and then run make version-update.
 
-PYTHON=python3.5
+PYTHON=python3.6
 
 URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.5b0
+VERSION=0.0.5b1
 SHELL:= /bin/bash
 
 test:
@@ -96,7 +96,7 @@ release-upload:
 version-update:
 	python misc/version.py
 	mv setup.py.tmp setup.py
-	mv hapiplotserver/hapiplotserver.tmp hapiplotserver/hapiplotserver
+	mv hapiplotserver/html/index.html.tmp hapiplotserver/html/index.html.tmp
 	mv hapiplotserver/main.py.tmp hapiplotserver/main.py
 	mv Makefile.tmp Makefile
 

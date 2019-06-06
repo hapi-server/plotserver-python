@@ -3,4 +3,5 @@ v0.0.2: 2019-02-14 -- Packaging fix
 v0.0.3: 2019-02-15 -- Packaging fix
 v0.0.4: 2019-03-07 -- Updates for hapiplot 0.0.9
 v0.0.5b0: 2019-03-08 -- Version for next release
+v0.0.5b1: 2019-06-04 -- Gallery improvements
 

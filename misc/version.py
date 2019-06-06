@@ -46,15 +46,13 @@ with open("setup.py.tmp", "w") as fout:
 fout.close()
 print("Wrote setup.py.tmp")
 
-for fname in ("hapiclient/hapi.py", "hapiclient/hapiplot.py"):
+for fname in ("hapiplotserver/main.py", "hapiplotserver/html/index.html"):
 	lines = ''
 	fin = open(fname)
 	for lineo in fin:
 		line1 = re.sub(r"__version__ = '(.*)'", r"__version__ = '" + version + "'", lineo)
 		updated1 = lineo != line1
-		line2 = re.sub(r"Version: (.*)", r"Version: "+version, line1)
-		updated2 = lineo != line2
-		lines = lines + line2
+		lines = lines + line1
 	fin.close()
 	assert updated1 is False or updated2 is False, \
 		"Problem updating version in " + fname + "."
