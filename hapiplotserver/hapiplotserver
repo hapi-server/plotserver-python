@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-desc="""
+desc = """
 Plot data from a HAPI server.
 
     List options and usage:
@@ -18,14 +18,14 @@ from hapiplotserver.main import hapiplotserver
 # Entry point for command line.
 if __name__ == "__main__":
 
-    # This is needed in order for test-virtualenv Makefile tests to work.
+    # The "hasattr" line is needed in order for test-virtualenv Makefile tests to work.
     # Without it, urlrequest silently fails when 'make test-virtualenv' is run.
     # However, if one does
     #   source env/bin/activate
     #   hapiplotserver --port 5001 --workers 4 --loglevel debug &
-    #   ... Execute failing curl request on command line
+    # and then one executes a failing test-virtualenv curl request on command line
     # the curl request works. So there is something about the Makefile environment
-    # that is screwing things up.
+    # that causes the test-virtualenv Makefile tests to fail.
     # TODO: When test_hapiplotserver.sh is converted to a python script, see if this is
     # needed anymore.
     if hasattr(sys, 'real_prefix'):
@@ -35,15 +35,36 @@ if __name__ == "__main__":
     conf = config()
     parser = optparse.OptionParser(add_help_option=False)
 
-    parser.add_option('-h', '--help', dest='help', action='store_true', help='show this help message and exit')
-
-    parser.add_option("--port", help="Server port " + "[%s]" % conf['port'], default=conf['port'])
-    parser.add_option("--cachedir", help="Cache directory " + "[%s]" % conf['cachedir'], default=conf['cachedir'])
-    parser.add_option("--loglevel", help="Log level " + "(error, default, debug) [%s]" % conf['loglevel'], default=conf['loglevel'])
-    parser.add_option("--threaded", type="int", help="Run each request in separate thread (0=no or 1=yes) " + "[%s]" % int(conf['threaded']), default=int(conf['threaded']))
-    parser.add_option("--usedatacache", type="int", help="Use cached data (0=no or 1=yes) " + "[%s]" % int(conf['usedatacache']), default=int(conf['usedatacache']))
-    parser.add_option("--usecache", type="int", help="Use cached images (0=no or 1=yes) " + "[%s]" % int(conf['usecache']), default=int(conf['usecache']))
-    parser.add_option("--workers", type="int", help="# of Gunicorn workers. If > 0, Gunicorn is used and 'threaded' option ignored. " + "[%s]" % int(conf['workers']), default=int(conf['workers']))
+    parser.add_option('-h', '--help',
+                      dest='help',
+                      action='store_true',
+                      help='show this help message and exit')
+    parser.add_option("--port",
+                      type="int",
+                      help="Server port " + "[%s]" % conf['port'],
+                      default=conf['port'])
+    parser.add_option("--cachedir",
+                      help="Cache directory " + "[%s]" % conf['cachedir'],
+                      default=conf['cachedir'])
+    parser.add_option("--loglevel",
+                      help="Log level " + "(error, default, debug) [%s]" % conf['loglevel'],
+                      default=conf['loglevel'])
+    parser.add_option("--threaded",
+                      type="int",
+                      help="Run each request in separate thread (0=no or 1=yes) " + "[%s]" % int(conf['threaded']),
+                      default=int(conf['threaded']))
+    parser.add_option("--usedatacache",
+                      type="int",
+                      help="Use cached data (0=no or 1=yes) " + "[%s]" % int(conf['usedatacache']),
+                      default=int(conf['usedatacache']))
+    parser.add_option("--usecache",
+                      type="int",
+                      help="Use cached images (0=no or 1=yes) " + "[%s]" % int(conf['usecache']),
+                      default=int(conf['usecache']))
+    parser.add_option("--workers",
+                      type="int",
+                      help="# of Gunicorn workers. If > 0, Gunicorn is used and 'threaded' option ignored. " + "[%s]" % int(conf['workers']),
+                      default=int(conf['workers']))
 
     (options, args) = parser.parse_args()
 
@@ -52,6 +73,13 @@ if __name__ == "__main__":
         print(desc)
         sys.exit(0)
 
+    # TODO: Test validity of options
+    # Test port: https://stackoverflow.com/a/43271125/1491619
+    # Test if can write to cachedir
+    # options.use = 0 or 1
+    # options.loglevel = error, default, debug
+    # options.threaded = 0 or 1
+    # options.works = ... not more than # of cpus?
     opts = {'port': options.port,
             'cachedir': options.cachedir,
             'usecache': bool(options.usecache),
@@ -59,4 +87,5 @@ if __name__ == "__main__":
             'threaded': bool(options.threaded),
             'workers': int(options.workers)
             }
+
     hapiplotserver(**opts)
