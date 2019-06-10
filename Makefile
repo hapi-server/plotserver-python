@@ -43,7 +43,7 @@ zz:
 
 test-virtualenv:
 	rm -rf env
-	$(PYTHON) -m virtualenv env
+	source activate $(PYTHON) && pip install virtualenv && $(PYTHON) -m virtualenv env
 	source env/bin/activate && \
 	    pip install pytest && \
         pip install . && \
