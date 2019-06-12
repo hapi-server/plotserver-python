@@ -2,6 +2,7 @@ from hapiclient.hapi import hapi, request2path
 from hapiclient.hapiplot import hapiplot
 
 def errorimage(figsize, format, dpi, message):
+    """Return a red png with hapiclient error message"""
 
     import re
     from io import BytesIO
@@ -9,17 +10,20 @@ def errorimage(figsize, format, dpi, message):
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
     j = 0
-    msg = message
-    for i in range(0,len(message)):
-        if message[i].startswith("  File"):
+    # Look for line in stack trace with HAPI error message.
+    for i in range(0, len(message)):
+        if message[i].startswith("hapiclient.util.error.<locals>.HAPIError:"):
             j = i
     if j > 0:
-        msg = re.sub(r'.*\/.*\/(.*)', r'\1', message[j]).strip()
-        msg = msg.replace('"', '').replace(',', '')
-        msg = msg + ":"
-        for k in range(j+1, len(message)):
-            if message[k].strip() != '':
-                msg = msg + "\n" + message[k].strip()
+        msg = message[j].replace('hapiclient.util.error.<locals>.HAPIError:', '')
+    else:
+        msg = ""
+
+    msgo = msg
+    # Make URL easier to read on image by inserting newlines.
+    msg = re.sub(r' http(.*)', r'\nhttp\1', msg)
+    msg = msg.replace("&", "\n   &")
+    msg = msg.replace("?", "\n   &")
 
     fig = Figure(figsize=figsize)
     canvas = FigureCanvas(fig)
@@ -32,11 +36,42 @@ def errorimage(figsize, format, dpi, message):
 
     ax.text(-1, 1, msg, verticalalignment='top', horizontalalignment='left')
 
-    figdataObj = BytesIO()
-    canvas.print_figure(figdataObj, format=format, facecolor='red', bbox_inches='tight', dpi=dpi)
-    figdata = figdataObj.getvalue()
+    figdata_obj = BytesIO()
+    canvas.print_figure(figdata_obj, format=format, facecolor='red', bbox_inches='tight', dpi=dpi)
 
-    return figdata
+    if msg == '' or format != 'png':
+        # No error or format is not for png
+        # Adding metadata to non-png files not tested or not implemented.
+        # TODO: Implement adding metadata to JPG, PDF, and SVG.
+        figdata = figdata_obj.getvalue()
+    else:
+        # Add error message to metadata
+        figdata = add_metadata(figdata_obj, msgo)
+
+    # Remove newlines with ";" in msg as it will be in a HTTP header.
+    return figdata, msgo.replace('\n', ';')
+
+
+def add_metadata(figdata_obj, msg):
+
+    from io import BytesIO
+    from PIL import Image, PngImagePlugin
+
+    meta = PngImagePlugin.PngInfo()
+    meta.add_text('hapiclient.hapiplot.error', msg, 0)
+
+    # Add metadata from Matplotlib
+    im = Image.open(figdata_obj)
+
+    for k, v in im.info.items():
+        meta.add_text(str(k), str(v), zip=0)
+
+    figdata_obj2 = BytesIO()
+    im = Image.open(figdata_obj)
+    im.save(figdata_obj2, "PNG", pnginfo=meta)
+
+    return figdata_obj2.getvalue()
+
 
 def plot(server, dataset, parameters, start, stop, **kwargs):
 
@@ -53,7 +88,8 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
                 'usecache':  kwargs['usedatacache']
                 }
         data, meta = hapi(server, dataset, parameters, start, stop, **opts)
-        if kwargs['loglevel'] == 'debug': print('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
+        if kwargs['loglevel'] == 'debug':
+            print('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
     except Exception as e:
         print(traceback.format_exc())
         message = traceback.format_exc().split('\n')

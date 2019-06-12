@@ -22,7 +22,7 @@ def config(**kwargs):
             "workers": workers,
             "figsize": (7, 3),
             "format": 'png',
-            "dpi": '144',
+            "dpi": 144,
             "transparent": False}
 
     for key in conf:

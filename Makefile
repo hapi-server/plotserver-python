@@ -34,11 +34,7 @@ test-repository:
 	- rm -rf $(TMPDIR)/hapi-data
 	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
 	source activate $(PYTHON); $(PYTHON) setup.py develop
-	source activate $(PYTHON); bash hapiplotserver/test/test_hapiplotserver.sh
-
-zz:
-	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
-	source activate $(PYTHON); $(PYTHON) setup.py develop
+	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_commandline.py
 	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
 test-virtualenv:
@@ -49,7 +45,7 @@ test-virtualenv:
         pip install . && \
         pip install ../client-python
 	source env/bin/activate && \
-	    bash hapiplotserver/test/test_hapiplotserver.sh
+	    bash hapiplotserver/test/test_commandline.py
 	source env/bin/activate && \
 	    python hapiplotserver/test/test_hapiplotserver.py
 

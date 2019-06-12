@@ -41,7 +41,7 @@ do
 	curl -s $url > $TMPDIR/a.png
 	curl -s $url > ~/Desktop/a.png
 	#ls -lh $TMPDIR/a.png
-	if [[ "$(find $TMPDIR/a.png -maxdepth 1 -size +60k)" == "$TMPDIR/a.png" ]]; then
+	if [[ "$(find $TMPDIR/a.png -maxdepth 1 -size +30k)" == "$TMPDIR/a.png" ]]; then
 		echo -e "test_hapiplotserver.sh: ${GREEN}PASS${NC}."
 	else
 		echo -e "test_hapiplotserver.sh: ${RED}FAIL${NC}."

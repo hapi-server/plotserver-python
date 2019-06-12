@@ -138,7 +138,7 @@ def app(conf):
         ct['Content-Length'] = len(img[0])
 
         if img[1] is not None:
-            ct["X-Error"] = img[1]
+            ct["X-HAPI-Error"] = img[1]
 
         return img[0], 200, ct
 
