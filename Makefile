@@ -41,13 +41,18 @@ test-virtualenv:
 	rm -rf env
 	source activate $(PYTHON) && pip install virtualenv && $(PYTHON) -m virtualenv env
 	source env/bin/activate && \
-	    pip install pytest && \
+	    pip install pytest requests Pillow && \
         pip install . && \
         pip install ../client-python
 	source env/bin/activate && \
-	    bash hapiplotserver/test/test_commandline.py
-	source env/bin/activate && \
-	    python hapiplotserver/test/test_hapiplotserver.py
+	    python hapiplotserver/test/test_commandline.py
+
+#	source env/bin/activate && \
+#	    python hapiplotserver/test/test_hapiplotserver.py
+# does not work in virtualenv on OS-X. Logs show
+# hapi(): Reading http://hapi-server.org/servers/TestData/hapi/info?id=dataset1
+# ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response',))
+# This happens even though the test works in the test-repository target.
 
 package:
 	make clean
