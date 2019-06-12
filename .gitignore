@@ -2,10 +2,12 @@
 tmp/
 *~
 .DS_Store
-hapiclient.egg-info/
+hapiplotserver.egg-info/
 dist/
 MANIFEST
 .pytest_cache/
 .ipynb_checkpoints/
 .vscode/
 .idea/
+.spyproject/
+env/
