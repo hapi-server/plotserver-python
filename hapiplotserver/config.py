@@ -29,6 +29,9 @@ def config(**kwargs):
         if key in kwargs:
             conf[key] = kwargs[key]
 
+    if not os.path.exists(conf['cachedir']):
+        os.makedirs(conf['cachedir'])
+
     # TODO: Add log-to-file option.
     # https://gist.github.com/ivanlmj/dbf29670761cbaed4c5c787d9c9c006b
     if conf['loglevel'] == 'error':
@@ -36,4 +39,3 @@ def config(**kwargs):
         log.setLevel(logging.ERROR)
 
     return conf
-

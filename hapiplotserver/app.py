@@ -1,8 +1,10 @@
 import os
 
 from hapiclient import hapi
+from hapiplotserver.log import log
 from hapiplotserver.plot import plot
-from hapiplotserver.viviz import prepviviz, req2slug
+from hapiplotserver.viviz import vivizconfig
+
 
 def app(conf):
 
@@ -123,7 +125,7 @@ def app(conf):
             # TODO: Set limits on figsize?
 
         if format == 'gallery':
-            indexhtm, vivizhash = prepviviz(server, dataset, parameters, start, stop, **conf)
+            indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
             # Get full URL
             url = url_for("viviz", _external=True)
             red = url + indexhtm + "#" + vivizhash

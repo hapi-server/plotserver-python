@@ -6,7 +6,7 @@ import webbrowser
 import requests
 from PIL import Image
 from multiprocessing import Process
-from hapiplotserver.main import hapiplotserver
+from hapiplotserver import hapiplotserver
 
 PORT = 5003
 
