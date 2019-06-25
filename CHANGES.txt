@@ -7,4 +7,4 @@ v0.0.5b1: 2019-06-04 -- Gallery improvements
 v0.0.5b2:
         2018-06-06 -- Add data cache options; improve version.py
         2018-06-12 -- Add HAPI error message to PNG metadata; Have tests use this.
-        2018-06-22 -- Refactor, add logging.
+        2018-06-22 -- Refactor; add logging.

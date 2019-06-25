@@ -99,14 +99,14 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
     gid = ""
     # ID is ViViz gallery ID. In ViViz, the server URL is the catalog ID.
     if parameters is not None:
+        # TODO: Check that all given parameters are valid
         gid = "&id=" + parameters.split(",")[0]
     else:
-        if dataset is not None:
-            meta = hapi(server, dataset0)
-            # Set first parameter shown to be first in dataset (if this is
-            # not done the time variable is the first parameter shown, which
-            # is generally not wanted.)
-            gid = "&id=" + meta['parameters'][1]['name']
+        meta = hapi(server, dataset0)
+        # Set first parameter shown to be first in dataset (if this is
+        # not done the time variable is the first parameter shown, which
+        # is generally not wanted.)
+        gid = "&id=" + meta['parameters'][1]['name']
 
     vivizhash = "catalog=" + server + "/" + dataset0 + gid
 

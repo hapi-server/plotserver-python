@@ -4,6 +4,14 @@ def config(**kwargs):
     import logging
     import tempfile
 
+    # TODO: Test validity of options
+    # Test port: https://stackoverflow.com/a/43271125/1491619
+    # Test if can write to cachedir
+    # options.use = 0 or 1
+    # options.loglevel = error, default, debug
+    # options.threaded = 0 or 1
+    # options.works = ... not more than # of cpus?
+
     # If `workers` > 0, use Gunicorn with this many workers;
     # `threaded` is ignored.
     workers = 0
