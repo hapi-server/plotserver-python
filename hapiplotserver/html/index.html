@@ -23,8 +23,7 @@
 					"server=http://hapi-server.org/servers/SSCWeb/hapi&id=ace&format=gallery",
 					"server=https://cdaweb.gsfc.nasa.gov/hapi&id=AC_H0_MFI&format=gallery",
 					"server=http://planet.physics.uiowa.edu/das/das2Server/hapi&id=Cassini/Ephemeris/Saturn,60s&format=gallery",
-					"server=http://datashop.elasticbeanstalk.com/hapi&id=CAPS_ELS_FLUX_HIRES&format=gallery",
-					"server=http://hapi.ftecs.com/hapi&format=gallery"
+					"server=http://datashop.elasticbeanstalk.com/hapi&id=CAPS_ELS_FLUX_HIRES&format=gallery"
 				];
 
 			$(document).ready(function(){
@@ -90,13 +89,10 @@
 			<ul id="exampleImageURLs"></ul>
 		<h1>Usage with <code>format</code> = <code>gallery</code></h1>
 			<p>
-				Generates a <a href="http://viviz.org/">ViViz</a> image gallery.
-			</p>
-			<p>
-				If only <code>server</code> is given, ViViz menu options allow viewing of all datasets and parameters over full range of available data.
+				Generates a <a href="http://viviz.org/">ViViz</a> image gallery for a dataset.
 			</p>
 			<ul>
-				<li>If <code>id</code> is not given, image gallery drop-down includes all datesets.</li>
+				<li><code>id</code> is required if <code>format</code> = <code>gallery</code></li>
 				<li>If <code>parameters</code> is not given, drop-down includes all parameters.</li>
 				<li><code>time.min</code> and/or <code>time.max</code> can be specified to constrain time range of images that can be viewed from default of full time range of available data.</li>
 			</ul>
@@ -104,7 +100,6 @@
 				Usage
 			</p>
 			<ul>
-				<li><code>?server=HAPIURL&format=gallery</code></li>
 				<li><code>?server=HAPIURL&id=ID&format=gallery</code></li>
 				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&format=gallery</code></li>
 				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&time.max=START&time.min=STOP&format=gallery</code></li>

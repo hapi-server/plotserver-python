@@ -122,6 +122,14 @@ def app(conf):
             # TODO: Set limits on figsize?
 
         if format == 'gallery':
+            if dataset is None:
+                """
+                If many datasets, vivizconfig() call will take a long
+                time and there will be no feedback.
+                """
+                return 'An id argument is required if format = "gallery", e.g., /?server=...&id=...[&parameters=...]',\
+                       400, {'Content-Type': 'text/html'}
+
             indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
             # Get full URL
             url = url_for("viviz", _external=True)

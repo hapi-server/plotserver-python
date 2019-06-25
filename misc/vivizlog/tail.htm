@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+  <title>Javascript tail -f</title>
+
+  <script type="text/javascript">
+    var lastByte = 0;
+
+    // Source: http://www.davejennifer.com/computerjunk/javascript/tail-dash-f.html
+
+    // Substitute the URL for your server log file here...
+    //
+    var url = "http://localhost:8000/log.log";
+
+    function tailf() {
+      var ajax = new XMLHttpRequest();
+      ajax.open("POST",url,true);
+
+      if (lastByte == 0) {
+        // First request - get everything
+      } else {
+        //
+        // All subsequent requests - add the Range header
+        //
+        ajax.setRequestHeader("Range", "bytes=" + parseInt(lastByte) + "-");
+      }
+
+      ajax.onreadystatechange = function() {
+        if(ajax.readyState == 4) {
+
+          if (ajax.status == 200) {
+            // only the first request
+            lastByte = parseInt(ajax.getResponseHeader("Content-length"));
+            document.getElementById("thePlace").innerHTML = ajax.responseText;
+            document.getElementById("theEnd").scrollIntoView()
+
+          } else if (ajax.status == 206) {
+            lastByte += parseInt(ajax.getResponseHeader("Content-length"));
+            document.getElementById("thePlace").innerHTML += ajax.responseText;
+            document.getElementById("theEnd").scrollIntoView()
+
+          } else if (ajax.status == 416) {
+            // no new data, so do nothing
+
+          } else {
+            //  Some error occurred - just display the status code and response
+            console.log("Ajax status: " + ajax.status + "\n" + ajax.getAllResponseHeaders());
+          }
+        }// ready state 4
+      }//orsc function def
+
+      ajax.send(null);
+
+    }// function tailf
+
+  </script>
+
+  </head>
+
+
+  <body onLoad='tailf(); setInterval("tailf()", 1000)'>
+    <div>
+      <pre id="thePlace"></pre>
+      <div id="theEnd"></div>
+    </div>
+  </body>
+</html>

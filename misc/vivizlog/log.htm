@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+    var source = new EventSource("/stream");
+    source.onerror = function(e) {
+      console.log("EventSource end or failed.");
+      source.close();
+    }
+    source.onmessage = function(event) {
+        console.log(event);
+        console.log(event.data);
+        console.log(event.id);
+        if (event.lastEventId === "-1") {
+            document.getElementById("output").innerHTML += "Redirecting to ViViz application at " + event.data + "<br/>"
+            //window.location = event.data;
+        }
+        document.getElementById("output").innerHTML += event.data + "<br/>"
+    }
+    </script>
+</head>
+<body>
+    <h1>Output</h1>
+    <div id="output"></div>
+</body>
+</html>
