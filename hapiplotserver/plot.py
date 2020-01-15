@@ -1,5 +1,7 @@
 from hapiclient.hapi import hapi, request2path
 from hapiclient.hapiplot import hapiplot
+from hapiplotserver.log import log
+
 
 def errorimage(figsize, format, dpi, message):
     """Return a red png with hapiclient error message"""
@@ -89,11 +91,13 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
                 'cachedir': kwargs['cachedir'],
                 'usecache':  kwargs['usedatacache']
                 }
+        if kwargs['loglevel'] == 'debug':
+            log('hapiplotserver.plot(): Calling hapi() to get data')
         data, meta = hapi(server, dataset, parameters, start, stop, **opts)
         if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
+            log('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
     except Exception as e:
-        print(traceback.format_exc())
+        log(traceback.format_exc())
         message = traceback.format_exc().split('\n')
         return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)
 
@@ -111,18 +115,21 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
                               }
                  }
 
+        if kwargs['loglevel'] == 'debug':
+            log('hapiplotserver.plot(): Calling hapiplot()')
+
         meta = hapiplot(data, meta, **popts)
         pn = -1 + len(meta['parameters'])
         img = meta['parameters'][pn]['hapiplot']['image']
 
         if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.plot(): Time for hapiplot() call = %f' % (time.time()-tic))
+            log('hapiplotserver.plot(): Time for hapiplot() call = %f' % (time.time()-tic))
         if not img:
             message = "hapiplot.py cannot plot parameter " + parameters
             return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)
         else:
             return img, None
     except Exception as e:
-        print(traceback.format_exc())
+        log(traceback.format_exc())
         message = traceback.format_exc().split('\n')
         return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)

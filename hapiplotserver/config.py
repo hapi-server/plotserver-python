@@ -4,6 +4,14 @@ def config(**kwargs):
     import logging
     import tempfile
 
+    # TODO: Test validity of options
+    # Test port: https://stackoverflow.com/a/43271125/1491619
+    # Test if can write to cachedir
+    # options.use = 0 or 1
+    # options.loglevel = error, default, debug
+    # options.threaded = 0 or 1
+    # options.works = ... not more than # of cpus?
+
     # If `workers` > 0, use Gunicorn with this many workers;
     # `threaded` is ignored.
     workers = 0
@@ -29,6 +37,9 @@ def config(**kwargs):
         if key in kwargs:
             conf[key] = kwargs[key]
 
+    if not os.path.exists(conf['cachedir']):
+        os.makedirs(conf['cachedir'])
+
     # TODO: Add log-to-file option.
     # https://gist.github.com/ivanlmj/dbf29670761cbaed4c5c787d9c9c006b
     if conf['loglevel'] == 'error':
@@ -36,4 +47,3 @@ def config(**kwargs):
         log.setLevel(logging.ERROR)
 
     return conf
-

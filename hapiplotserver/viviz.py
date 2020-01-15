@@ -1,44 +1,39 @@
-def prepviviz(server, dataset, parameters, start, stop, **kwargs):
-    """Prepare ViViz web application"""
-
-    import os
-    vivizdir = kwargs['cachedir'] + "/viviz"
-
-    if not os.path.exists(vivizdir):
-        if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.viviz(): Downloading ViViz to ' + kwargs['cachedir'])
-        getviviz(**kwargs)
-    else:
-        if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.viviz(): Found ViViz at ' + vivizdir)
-
-    return vivizconfig(server, dataset, parameters, start, stop, **kwargs)
+from hapiplotserver.log import log
 
 
 def getviviz(**kwargs):
     """Download ViViz web application"""
 
-    # TODO: Copy index.js to index-orig.js
-    # In vivizconfig() copy index-orig.js to filename associated with request URL
-    import shutil
+    import os
     import zipfile
-    from hapiclient.util import system, download
+    import requests
 
-    url = 'https://github.com/rweigel/viviz/archive/master.zip'
-    file = kwargs['cachedir'] + '/viviz-master.zip'
-    if shutil.which('git'):
-        print('hapiplotserver.getviviz(): Cloning ViViz ' + kwargs['cachedir'])
-        code, stderr, stdout = system('git clone --depth 1 https://github.com/rweigel/viviz.git ' + kwargs['cachedir'] + '/viviz')
+    vivizdir = kwargs['cachedir'] + "/viviz"
+
+    if not os.path.exists(vivizdir):
+        url = 'https://github.com/rweigel/viviz/archive/master.zip'
+
         if kwargs['loglevel'] == 'debug':
-            if code != 0:
-                print('hapiplotserver.getviviz(): stdout:\n' + stdout)
-                print('hapiplotserver.getviviz(): stderr:\n' + stderr)
-    else:
-        print('hapiplotserver.getviviz(): Downloading ' + url)
-        download(file, url)
+            log('hapiplotserver.viviz(): Downloading ' + url + ' to ' + kwargs['cachedir'])
+
+        file = kwargs['cachedir'] + '/viviz-master.zip'
+
+        r = requests.get(url, allow_redirects=True)
+        open(file, 'wb').write(r.content)
+
+        if kwargs['loglevel'] == 'debug':
+            log('hapiplotserver.viviz(): Unzipping ' + file)
+
         zipref = zipfile.ZipFile(file, 'r')
         zipref.extractall(kwargs['cachedir'])
         zipref.close()
+
+        os.rename(vivizdir + "-master", vivizdir)
+
+    else:
+        if kwargs['loglevel'] == 'debug':
+            log('hapiplotserver.viviz(): Found ViViz at ' + vivizdir)
+
 
 
 def req2slug(server, dataset, parameters, start, stop):
@@ -72,15 +67,15 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
     indexhtm = kwargs['cachedir'] + '/viviz/index-' + slug + '.htm'
     indexhtmo = kwargs['cachedir'] + '/viviz/index.htm'
     shutil.copyfile(indexhtmo, indexhtm)
-    print('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexhtm)
+    log('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexhtm)
 
     fid = hashlib.md5(bytes(slug, 'utf8')).hexdigest()
     indexhtm_hash = kwargs['cachedir'] + '/viviz/' + fid[0:4]
     if os.path.isfile(indexhtm_hash):
         os.remove(indexhtm_hash)
-        print('hapiplotserver.viviz.vivizconfig(): Removed existing %s' % indexhtm_hash)
+        log('hapiplotserver.viviz.vivizconfig(): Removed existing %s' % indexhtm_hash)
 
-    print('hapiplotserver.viviz.vivizconfig(): Symlinking %s with %s' % (indexhtm, indexhtm_hash))
+    log('hapiplotserver.viviz.vivizconfig(): Symlinking %s with %s' % (indexhtm, indexhtm_hash))
     os.symlink(indexhtm, indexhtm_hash)
     indexhtm_hash = fid[0:4]
 
@@ -104,14 +99,14 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
     gid = ""
     # ID is ViViz gallery ID. In ViViz, the server URL is the catalog ID.
     if parameters is not None:
+        # TODO: Check that all given parameters are valid
         gid = "&id=" + parameters.split(",")[0]
     else:
-        if dataset is not None:
-            meta = hapi(server, dataset0)
-            # Set first parameter shown to be first in dataset (if this is
-            # not done the time variable is the first parameter shown, which
-            # is generally not wanted.)
-            gid = "&id=" + meta['parameters'][1]['name']
+        meta = hapi(server, dataset0)
+        # Set first parameter shown to be first in dataset (if this is
+        # not done the time variable is the first parameter shown, which
+        # is generally not wanted.)
+        gid = "&id=" + meta['parameters'][1]['name']
 
     vivizhash = "catalog=" + server + "/" + dataset0 + gid
 
@@ -133,7 +128,7 @@ def adddataset(server, dataset, indexjs, **kwargs):
         os.makedirs(dname)
 
     if kwargs['loglevel'] == 'debug':
-        print('hapiplotserver.viviz.adddataset(): Appending to ' + indexjs)
+        log('hapiplotserver.viviz.adddataset(): Appending to ' + indexjs)
 
     with open(indexjs, 'a') as f:
         f.write('\nVIVIZ["config"]["catalogs"]["%s/%s"] = {};\n' % (server, dataset))
@@ -143,7 +138,7 @@ def adddataset(server, dataset, indexjs, **kwargs):
 
     if False and os.path.exists(catalogabs):
         if kwargs['loglevel'] == 'debug':
-            print('hapiplotserver.viviz.adddataset(): Using cached ' + catalogabs)
+            log('hapiplotserver.viviz.adddataset(): Using cached ' + catalogabs)
         return
 
     meta = hapi(server, dataset)
@@ -185,7 +180,7 @@ def adddataset(server, dataset, indexjs, **kwargs):
         galleries.append(galleryc)
 
     if kwargs['loglevel'] == 'debug':
-        print('hapiplotserver.viviz.vivizconfig(): Writing ' + catalogabs)
+        log('hapiplotserver.viviz.vivizconfig(): Writing ' + catalogabs)
 
     with open(catalogabs, 'w') as f:
         json.dump(galleries, f, indent=4)

@@ -2,11 +2,12 @@ import os
 
 from hapiclient import hapi
 from hapiplotserver.plot import plot
-from hapiplotserver.viviz import prepviviz, req2slug
+from hapiplotserver.viviz import vivizconfig
+
 
 def app(conf):
 
-    from flask import Flask, request, redirect, send_from_directory, make_response, url_for
+    from flask import Flask, Response, request, redirect, send_from_directory, make_response, url_for
     application = Flask(__name__)
 
     loglevel = conf['loglevel']
@@ -38,7 +39,9 @@ def app(conf):
 
     @application.route("/")
     def main():
-        if request.args.get('server') is None:
+
+        server = request.args.get('server')
+        if server is None:
             return send_from_directory(appdir + "/html/", "index.html")
 
         format = request.args.get('format')
@@ -53,10 +56,6 @@ def app(conf):
             ct = {'Content-Type': 'image/svg+xml'}
         else:
             ct = {'Content-Type': 'text/html'}
-
-        server = request.args.get('server')
-        if server is None:
-            return 'A server argument is required, e.g., /?server=...', 400, {'Content-Type': 'text/html'}
 
         dataset = request.args.get('id')
         if dataset is None and format != 'gallery':
@@ -123,7 +122,15 @@ def app(conf):
             # TODO: Set limits on figsize?
 
         if format == 'gallery':
-            indexhtm, vivizhash = prepviviz(server, dataset, parameters, start, stop, **conf)
+            if dataset is None:
+                """
+                If many datasets, vivizconfig() call will take a long
+                time and there will be no feedback.
+                """
+                return 'An id argument is required if format = "gallery", e.g., /?server=...&id=...[&parameters=...]',\
+                       400, {'Content-Type': 'text/html'}
+
+            indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
             # Get full URL
             url = url_for("viviz", _external=True)
             red = url + indexhtm + "#" + vivizhash

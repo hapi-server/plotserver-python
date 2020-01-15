@@ -1,13 +1,13 @@
 import sys
+
 from hapiplotserver.app import app
 from hapiplotserver.config import config
+from hapiplotserver.viviz import getviviz
 
 
 def gunicorn(app, **kwargs):
 
-    import sys
-
-    def action(host='127.0.0.1',port=kwargs['port'], workers=kwargs['workers']):
+    def action(host='127.0.0.1', port=kwargs['port'], workers=kwargs['workers']):
         
         from gunicorn.app.base import Application
         
@@ -43,6 +43,8 @@ def hapiplotserver(**kwargs):
     print(' * Using Python %d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2]))
     print(' * See ' + url + ' for API description.')
     print(' * Cache directory: ' + conf['cachedir'])
+
+    getviviz(**conf)
 
     if conf['workers'] == 0:
         application.run(port=conf['port'], threaded=conf['threaded'])

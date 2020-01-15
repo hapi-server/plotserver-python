@@ -16,8 +16,8 @@ cmd = "hapiplotserver --port " + str(PORT) + " --workers 2 --loglevel debug &"
 print("test_commandline.py: Starting server using " + cmd)
 os.system(cmd)
 
-print("test_commandline.py: Sleeping for 2 seconds before running tests.")
-time.sleep(2)
+print("test_commandline.py: Sleeping for 5 seconds before running tests.")
+time.sleep(5)
 
 exit_signal = 0
 urlfile = os.path.dirname(os.path.realpath(__file__)) + "/urls.txt"

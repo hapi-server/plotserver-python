@@ -13,7 +13,8 @@
 #     Sometimes takes ~5 minutes even though web page is immediately
 #     updated.)
 # 4. After package is finalized, create new version number in CHANGES.txt ending
-#    with "b0" in setup.py and then run make version-update.
+#    with "bN" in setup.py and then run
+#    make version-update.
 
 PYTHON=python3.6
 
