@@ -10,14 +10,16 @@ def errorimage(figsize, format, dpi, message):
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
     j = 0
-    # Look for line in stack trace with HAPI error message.
+    # Look for last line in stack trace with HAPI error message.
     for i in range(0, len(message)):
         if message[i].startswith("hapiclient.util.error.<locals>.HAPIError:"):
             j = i
     if j > 0:
         msg = message[j].replace('hapiclient.util.error.<locals>.HAPIError:', '')
     else:
-        msg = ""
+        for i in range(0, len(message)):
+            message[i] = re.sub(r'(.*)File ".*/(.*)"', r'\1File \2', message[i])
+        msg = "\n".join(message)
 
     msgo = msg
     # Make URL easier to read on image by inserting newlines.
