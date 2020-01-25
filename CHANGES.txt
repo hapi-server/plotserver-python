@@ -8,3 +8,6 @@ v0.0.5b2:
         2018-06-06 -- Add data cache options; improve version.py
         2018-06-12 -- Add HAPI error message to PNG metadata; Have tests use this.
         2018-06-22 -- Refactor; add logging.
+        2019-01-15 -- Add stack trace for non-HAPI errors
+v0.0.5b3:
+		2018-01-15 -- Require hapiclient 0.1.1

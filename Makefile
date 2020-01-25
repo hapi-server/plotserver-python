@@ -22,7 +22,7 @@ URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.5b2
+VERSION=0.0.5b3
 SHELL:= /bin/bash
 
 test:
@@ -107,7 +107,7 @@ version-tag:
 # Use package in ./hapiplotserver instead of that installed by pip.
 # This seems to not work in Spyder.
 install-local:
-	python setup.py
+	python setup.py install
 
 install:
 	pip install 'hapiplotserver==$(VERSION)' --index-url $(URL)simple

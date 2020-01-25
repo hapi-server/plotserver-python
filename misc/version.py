@@ -23,7 +23,7 @@ fin.close()
 version = version.rstrip()
 print("Using version = " + version)
 
-fnames = ["Makefile","setup.py", "hapiplotserver/main.py", "hapiplotserver/hapiplotserver", "hapiplotserver/html/index.html"]
+fnames = ["Makefile","setup.py", "hapiplotserver/hapiplotserver.py", "hapiplotserver/hapiplotserver", "hapiplotserver/html/index.html"]
 regexes = ["VERSION=(.*)","version=(.*)","__version__ = (.*)", "Version: (.*)", "<code>hapiplotserver-(.*)</code>"]
 replaces = ["VERSION=" + version, "version='" + version + "',", "__version__ = '" + version + "'", "Version: " + version, "<code>hapiplotserver-" + version + "</code>"]
 for i in range(len(fnames)):

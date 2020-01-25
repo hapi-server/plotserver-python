@@ -3,7 +3,7 @@ import sys
 from hapiplotserver.app import app
 from hapiplotserver.config import config
 from hapiplotserver.viviz import getviviz
-
+from hapiclient import __version__ as hapiclient_version
 
 def gunicorn(app, **kwargs):
 
@@ -35,12 +35,13 @@ def hapiplotserver(**kwargs):
     conf = config(**kwargs)
     application = app(conf)
 
-    __version__ = '0.0.5b2'
+    __version__ = '0.0.5b3'
 
     url = 'http://127.0.0.1:'+str(conf['port'])+"/"
     print(' * hapiplotserver version ' + __version__)
+    print(' * hapiclient version ' + hapiclient_version)
+    print(' * python version %d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2]))
     print(' * Starting server for ' + url)
-    print(' * Using Python %d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2]))
     print(' * See ' + url + ' for API description.')
     print(' * Cache directory: ' + conf['cachedir'])
 
