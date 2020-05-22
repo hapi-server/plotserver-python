@@ -7,6 +7,8 @@ Plot data from a HAPI server.
         hapiplotserver -h
 
 Version: 0.0.5b3
+
+Use GUNICORN_CMD_ARGS="--reload" hapiplotserver ... to reload when files change.
 """
 
 import sys
