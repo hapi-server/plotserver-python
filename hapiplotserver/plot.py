@@ -1,6 +1,7 @@
 from hapiclient.hapi import hapi, request2path
 from hapiclient.hapiplot import hapiplot
 from hapiplotserver.log import log
+from hapiclient import __version__ as hapiclient_version
 
 
 def errorimage(figsize, format, dpi, message):
@@ -22,6 +23,8 @@ def errorimage(figsize, format, dpi, message):
         for i in range(0, len(message)):
             message[i] = re.sub(r'(.*)File ".*/(.*)"', r'\1File \2', message[i])
         msg = "\n".join(message)
+
+    msg = "hapiclient version " + hapiclient_version + "\n" + msg
 
     msgo = msg
     # Make URL easier to read on image by inserting newlines.
