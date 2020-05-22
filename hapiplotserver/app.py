@@ -1,9 +1,12 @@
+import re
 import os
+import traceback
 
 from hapiclient import hapi
+from hapiplotserver.log import log
 from hapiplotserver.plot import plot
 from hapiplotserver.viviz import vivizconfig
-
+from hapiclient import __version__ as hapiclient_version
 
 def app(conf):
 
@@ -28,7 +31,7 @@ def app(conf):
         if conf[cachestr] is False and usecache is True:
             usecache = False
             if loglevel == 'debug':
-                print('app(): Application configuration has ' + cachestr + '=False so request to use cache is ignored.')
+                log('app(): Application configuration has ' + cachestr + '=False so request to use cache is ignored.')
 
         return usecache
 
@@ -63,15 +66,15 @@ def app(conf):
 
         parameters = request.args.get('parameters')
         if parameters is None and format != 'gallery':
-            return 'A parameters argument is required if format != "gallery", e.g., /?server=...&id=...&parameters=...', 400, {'Content-Type': 'text/html'}
+            return 'A parameters argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
 
         start = request.args.get('time.min')
         if start is None and format != 'gallery':
-            return 'A time.min argument is required if format != "gallery", e.g., /?server=...&id=...&parameters=...', 400, {'Content-Type': 'text/html'}
+            return 'A time.min argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
 
         stop = request.args.get('time.max')
         if start is None and format != 'gallery':
-            return 'A time.max argument is required if format != "gallery", e.g., /?server=...&id=...&parameters=...', 400, {'Content-Type': 'text/html'}
+            return 'A time.max argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
 
         meta = None
         if start is None and format != 'gallery':
@@ -127,14 +130,15 @@ def app(conf):
                 If many datasets, vivizconfig() call will take a long
                 time and there will be no feedback.
                 """
-                return 'An id argument is required if format = "gallery", e.g., /?server=...&id=...[&parameters=...]',\
-                       400, {'Content-Type': 'text/html'}
+                #return 'An id argument is required if format = "gallery", e.g., /?server=...&id=...[&amp;parameters=...]',\
+                #       400, {'Content-Type': 'text/html'}
 
             indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
+
             # Get full URL
             url = url_for("viviz", _external=True)
             red = url + indexhtm + "#" + vivizhash
-            print("hapiplotserver.app.main(): Redirecting to " + red)
+            log("hapiplotserver.app.main(): Redirecting to " + red)
             return redirect(red, code=302)
 
         # Plot function options
@@ -164,8 +168,18 @@ def app(conf):
             response.headers['Content-Disposition'] = 'inline'
         return response
 
-    @application.errorhandler(500)
+    from werkzeug.exceptions import InternalServerError
+    @application.errorhandler(InternalServerError)
     def internal_error(error):
-        print(error)
-
+        print(traceback.format_exc())
+        message = traceback.format_exc().split('\n')
+        for i in range(0, len(message)):
+            message[i] = re.sub(r'(.*)File ".*/(.*)"', r'\1File \2', message[i])
+            message[i] = re.sub(r'\s', r'&nbsp;', message[i])
+        msg = "<br/>".join(message)
+        #TODO
+        #vers = "hapiplotserver v" + __version__
+        vers = "hapiclient v" + hapiclient_version + "<br/>"
+        return vers + msg, 500
+ 
     return application
