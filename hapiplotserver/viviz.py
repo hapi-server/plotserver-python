@@ -37,7 +37,7 @@ def getviviz(**kwargs):
 
 
 def req2slug(server, dataset, parameters, start, stop):
-    """Convert HAPI request parameters to santized string for part of file name"""
+    """Convert HAPI request parameters to sanitized string for part of file name"""
 
     from slugify import slugify
 
@@ -62,20 +62,24 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
     indexjs = kwargs['cachedir'] + '/' + indexjs_rel
     indexjso = kwargs['cachedir'] + '/viviz/index.js'
     shutil.copyfile(indexjso, indexjs)
-    print('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexjs)
+    if kwargs['loglevel'] == 'debug':
+        log('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexjs)
 
     indexhtm = kwargs['cachedir'] + '/viviz/index-' + slug + '.htm'
     indexhtmo = kwargs['cachedir'] + '/viviz/index.htm'
     shutil.copyfile(indexhtmo, indexhtm)
-    log('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexhtm)
+    if kwargs['loglevel'] == 'debug':
+        log('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexhtm)
 
     fid = hashlib.md5(bytes(slug, 'utf8')).hexdigest()
     indexhtm_hash = kwargs['cachedir'] + '/viviz/' + fid[0:4]
     if os.path.isfile(indexhtm_hash):
         os.remove(indexhtm_hash)
-        log('hapiplotserver.viviz.vivizconfig(): Removed existing %s' % indexhtm_hash)
+        if kwargs['loglevel'] == 'debug':
+            log('hapiplotserver.viviz.vivizconfig(): Removed existing %s' % indexhtm_hash)
 
-    log('hapiplotserver.viviz.vivizconfig(): Symlinking %s with %s' % (indexhtm, indexhtm_hash))
+    if kwargs['loglevel'] == 'debug':
+        log('hapiplotserver.viviz.vivizconfig(): Symlinking %s with %s' % (indexhtm, indexhtm_hash))
     os.symlink(indexhtm, indexhtm_hash)
     indexhtm_hash = fid[0:4]
 
@@ -87,11 +91,30 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
         f.write(tmp)
 
     if dataset is None:
-        catalog = hapi(server)
-        dataset0 = catalog["catalog"][0]["id"]  # First dataset
-        for i in range(len(catalog["catalog"])):
-            dataset = catalog["catalog"][i]["id"]
-            adddataset(server, dataset, indexjs, **kwargs)
+        import requests
+        # See if server provides all.json
+        xurl = server + "/all.json"
+        if kwargs['loglevel'] == 'debug':
+            log('hapiplotserver.viviz.vivizconfig(): Getting %s' % xurl)
+
+        try:
+            r = requests.get(xurl, allow_redirects=True)
+        except Exception as e:
+            r = False
+
+        if r and r.status_code == 200:
+            if kwargs['loglevel'] == 'debug':
+                log('hapiplotserver.viviz.vivizconfig(): Got %s' % xurl)
+            catalog = r.json()
+            dataset0 = list(catalog.keys())[0]
+            adddatasets(server, catalog, indexjs, **kwargs)
+        else:
+            log('hapiplotserver.viviz.vivizconfig(): Could not get %s' % xurl)
+            catalog = hapi(server)
+            dataset0 = catalog["catalog"][0]["id"]  # First dataset
+            for i in range(len(catalog["catalog"])):
+                dataset = catalog["catalog"][i]["id"]
+                adddataset(server, dataset, indexjs, **kwargs)
     else:
         dataset0 = dataset
         adddataset(server, dataset, indexjs, **kwargs)
@@ -108,10 +131,63 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
         # is generally not wanted.)
         gid = "&id=" + meta['parameters'][1]['name']
 
-    vivizhash = "catalog=" + server + "/" + dataset0 + gid
+    import re
+    # ViViz assumes ID starting with http means configuration is obtained from that address
+    serverx = re.sub(r"https*://", "", server) 
+
+    #vivizhash = "catalog=" + server + "/" + dataset0 + gid
+    if dataset is None:
+        vivizhash = "catalog=" + "" + server + "/" + dataset0 + gid
+    else:
+        vivizhash = "catalog=" + server + "/" + dataset0 + gid
 
     return indexhtm_hash, vivizhash
 
+def adddatasets(server, datasets, indexjs, **kwargs):
+    import os
+    import re
+    import json
+    from hapiclient.hapi import hapi, hapitime2datetime, server2dirname
+
+    if kwargs['loglevel'] == 'debug':
+        log('hapiplotserver.viviz.adddataset(): Appending to ' + indexjs)
+
+    s = ''
+    # ViViz assumes ID starting with http means configuration is obtained from that address
+    serverx = re.sub(r"https*://", "", server) 
+    for dataset, meta in datasets.items():
+        s = s + '\nVIVIZ["config"]["catalogs"]["%s/%s"] = {"URL": ""};\n' % (server, dataset)
+        s = s + 'VIVIZ["catalogs"]["%s/%s"] = \n' % (server, dataset)
+        #s = s + '\nVIVIZ["config"]["catalogs"]["a/%s"] = {"URL": ""};\n' % (dataset)
+        #s = s + 'VIVIZ["catalogs"]["a/%s"] = \n' % (dataset)
+
+        gallery = {
+                     'id': server,
+                     'aboutlink': server,
+                     'strftime': "time.min=$Y-$m-$dT00:00:00.000Z&time.max=$Y-$m-$dT23:59:59.999Z",
+                     'start': adjust_time(meta['startDate'], 1),
+                     'stop': adjust_time(meta['stopDate'], -1),
+                     'fulldir': ''
+                    }
+
+        galleries = []
+        for parameter in meta['parameters']:
+            p = parameter['name']
+            fulldir = "../?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&"
+            thumbdir = "../?server=" + server + "&id=" + dataset + "&parameters=" + p + "&usecache=" + str(kwargs['usecache']).lower() + "&format=png&dpi=72&"
+            galleryc = gallery.copy()
+            galleryc['fulldir'] = fulldir
+            galleryc['thumbdir'] = thumbdir
+            galleryc['id'] = p
+            galleryc['aboutlink'] = server + "/info?id=" + dataset
+            galleries.append(galleryc)
+
+        s = s + json.dumps(galleries, indent=4) + "\n"
+
+    if kwargs['loglevel'] == 'debug':
+        log('hapiplotserver.viviz.adddataset(): Appending to ' + indexjs)
+    with open(indexjs, 'a') as f:
+        f.write(s)
 
 def adddataset(server, dataset, indexjs, **kwargs):
 
@@ -143,21 +219,6 @@ def adddataset(server, dataset, indexjs, **kwargs):
 
     meta = hapi(server, dataset)
 
-    def adjust_time(hapitime, ndays):
-        """Convert HAPI Time to %Y-%m-%d and add +/1 day"""
-
-        from datetime import datetime, date, timedelta
-        from hapiclient import hapitime2datetime
-
-        dt = hapitime2datetime(hapitime)[0]
-        if dt.strftime('%Y-%m-%dT%H:%M:%D.%f') != dt.strftime('%Y-%m-%dT00:00:00.000000'):
-            dt = datetime.date(dt) + timedelta(days=ndays)
-
-        # The following is needed as it will convert startDate in YYYY-DOY
-        # format to YYYY-MM-DD, which ViViz only handles.
-        time_string = dt.strftime('%Y-%m-%d')
-        return time_string
-
     gallery = {
                  'id': server,
                  'aboutlink': server,
@@ -184,3 +245,18 @@ def adddataset(server, dataset, indexjs, **kwargs):
 
     with open(catalogabs, 'w') as f:
         json.dump(galleries, f, indent=4)
+
+def adjust_time(hapitime, ndays):
+    """Convert HAPI Time to %Y-%m-%d and add +/1 day"""
+
+    from datetime import datetime, date, timedelta
+    from hapiclient import hapitime2datetime
+
+    dt = hapitime2datetime(hapitime)[0]
+    if dt.strftime('%Y-%m-%dT%H:%M:%D.%f') != dt.strftime('%Y-%m-%dT00:00:00.000000'):
+        dt = datetime.date(dt) + timedelta(days=ndays)
+
+    # The following is needed as it will convert startDate in YYYY-DOY
+    # format to YYYY-MM-DD, which ViViz only handles.
+    time_string = dt.strftime('%Y-%m-%d')
+    return time_string
