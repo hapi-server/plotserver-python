@@ -1,6 +1,8 @@
 # Fixes
 * planet.physics.uiowa.edu does not work
 
+# Add option for https://github.com/Brightcells/pngquant
+
 # Code improvements
 * Return error if keywords not in allowed list are given.
 * Test validity of options in config.py
