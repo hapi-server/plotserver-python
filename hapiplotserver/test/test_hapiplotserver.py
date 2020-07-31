@@ -14,17 +14,17 @@ print("test_hapiplotserver.py: Starting server.")
 
 if False:
     # Run in main thread
-    kwargs = {'port': PORT, 'loglevel': 'debug'}
+    kwargs = {'port': PORT, 'loglevel': 'default'}
     hapiplotserver(**kwargs)
     # Then open http://127.0.0.1:PORT/
     sys.exit(0)
 
 if True:
-    kwargs = {'port': PORT, 'workers': 1, 'loglevel': 'debug'}
+    kwargs = {'port': PORT, 'workers': 4, 'loglevel': 'default'}
     process = Process(target=hapiplotserver, kwargs=kwargs)
     process.start()
     print("test_hapiplotserver.py: Sleeping for 3 seconds while server starts.")
-    time.sleep(2)
+    time.sleep(3)
 
 try:
 

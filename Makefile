@@ -34,6 +34,8 @@ test:
 test-repository:
 	- rm -rf $(TMPDIR)/hapi-data
 	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
+	#https://stackoverflow.com/questions/30306099/pip-install-editable-vs-python-setup-py-develop
+	#$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) setup.py develop
 	source activate $(PYTHON); pip install --editable . # $(PYTHON) setup.py develop | grep "Best"
 	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_commandline.py
 	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
