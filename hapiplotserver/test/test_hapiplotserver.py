@@ -12,16 +12,24 @@ PORT = 5003
 
 print("test_hapiplotserver.py: Starting server.")
 
-kwargs = {'port': PORT, 'workers': 4, 'loglevel': 'debug'}
-process = Process(target=hapiplotserver, kwargs=kwargs)
-process.start()
-print("test_hapiplotserver.py: Sleeping for 3 seconds while server starts.")
-time.sleep(3)
+if False:
+    # Run in main thread
+    kwargs = {'port': PORT, 'loglevel': 'debug'}
+    hapiplotserver(**kwargs)
+    # Then open http://127.0.0.1:PORT/
+    sys.exit(0)
+
+if True:
+    kwargs = {'port': PORT, 'workers': 1, 'loglevel': 'debug'}
+    process = Process(target=hapiplotserver, kwargs=kwargs)
+    process.start()
+    print("test_hapiplotserver.py: Sleeping for 3 seconds while server starts.")
+    time.sleep(2)
 
 try:
 
-    if True:
-        url = 'http://127.0.0.1:' + str(kwargs['port']) + '/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&parameters=Time&time.min=1970-01-01Z&time.max=1970-01-02T00:00:00Z&format=png&usecache=False'
+    if False:
+        url = 'http://127.0.0.1:' + str(kwargs['port']) + '/?server=http://hapi-server.org/servers/TestData2.0/hapi&id=dataset1&parameters=scalar&time.min=1970-01-01Z&time.max=1970-01-01T00:00:11Z&transparent=false&usecache=False'
         r = requests.get(url)
         r.raise_for_status()
         with io.BytesIO(r.content) as fi:
@@ -32,12 +40,19 @@ try:
             print("test_hapiplotserver.py: \033[0;32mPASS\033[0m")
 
     if True:
-        url = 'http://127.0.0.1:' + str(kwargs['port']) + '/?server=http://hapi-server.org/servers/TestData/hapi&id=dataset1&format=gallery'
+        url = 'http://127.0.0.1:' + str(kwargs['port']) \
+                + '/?server=http://hapi-server.org/servers/TestData2.0/hapi&id=dataset1&parameters=scalar' \
+                + '&format=gallery'
         print(' * Opening in browser tab:')
         print(' * ' + url)
         webbrowser.open(url, new=2)
 
 except Exception as e:
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    NC='\033[0m'
+    print(RED + "FAIL" + NC)
+
     print(e)
     print("Terminating server.")
     process.terminate()

@@ -22,19 +22,19 @@ URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.5b3
+VERSION=0.0.5b4
 SHELL:= /bin/bash
 
 test:
     make test-virtualenv PYTHON=python3.6
     make test-virtualenv PYTHON=python2.7
-	make test-repository PYTHON=python3.6
+    make test-repository PYTHON=python3.6
     make test-repository PYTHON=python2.7
 
 test-repository:
 	- rm -rf $(TMPDIR)/hapi-data
 	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
-	source activate $(PYTHON); $(PYTHON) setup.py develop
+	source activate $(PYTHON); pip install --editable . # $(PYTHON) setup.py develop | grep "Best"
 	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_commandline.py
 	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
