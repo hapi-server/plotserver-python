@@ -16,7 +16,8 @@ def gunicorn(app, **kwargs):
             def init(self, parser, opts, args):
                 return {
                     'bind': '{0}:{1}'.format(host, port),
-                    'workers': workers
+                    'workers': workers,
+                    'accesslog': '-'
                 }
             
             def load(self):

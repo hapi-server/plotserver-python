@@ -60,8 +60,8 @@ def app(conf):
         else:
             ct = {'Content-Type': 'text/html'}
 
-        if loglevel == 'debug':
-            print(request.args)
+        #if loglevel == 'debug':
+        #    print(request.args)
 
         dataset = request.args.get('id')
         if dataset is None and format != 'gallery':
