@@ -17,26 +17,34 @@
 #    make version-update.
 
 PYTHON=python3.6
+PYTHON_VER=$(subst python,,$(PYTHON))
 
 URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.5b4
+VERSION=0.0.5b3
 SHELL:= /bin/bash
+
+CONDA=./anaconda3
+#CONDA=/opt/anaconda3
+#CONDA=~/anaconda3
+CONDA_ACTIVATE=source $(CONDA)/etc/profile.d/conda.sh; conda activate
 
 test:
     make test-virtualenv PYTHON=python3.6
     make test-virtualenv PYTHON=python2.7
-    make test-repository PYTHON=python3.6
+	make test-repository PYTHON=python3.6
     make test-repository PYTHON=python2.7
 
 test-repository:
 	- rm -rf $(TMPDIR)/hapi-data
-	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
-	source activate $(PYTHON); pip install --editable . # $(PYTHON) setup.py develop | grep "Best"
-	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_commandline.py
-	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
+	make condaenv python=$(PYTHON)
+	$(CONDA_ACTIVATE) $(PYTHON) && pip uninstall -y -q hapiplotserver
+	$(CONDA_ACTIVATE) $(PYTHON) && pip install hapiclient
+	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) setup.py develop | grep "Best"
+	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_commandline.py
+	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
 test-virtualenv:
 	rm -rf env
@@ -54,6 +62,24 @@ test-virtualenv:
 # hapi(): Reading http://hapi-server.org/servers/TestData/hapi/info?id=dataset1
 # ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response',))
 # This happens even though the test works in the test-repository target.
+
+CONDA_PKG=Miniconda3-latest-Linux-x86_64.sh
+ifeq ($(shell uname -s),Darwin)
+	CONDA_PKG=Miniconda3-latest-MacOSX-x86_64.sh
+endif
+
+condaenv: 
+	make $(CONDA)/envs/$(PYTHON) PYTHON=$(PYTHON)
+
+$(CONDA)/envs/$(PYTHON): $(CONDA)
+	$(CONDA_ACTIVATE); \
+		$(CONDA)/bin/conda create -y --name $(PYTHON) python=$(PYTHON_VER)
+
+$(CONDA): /tmp/$(CONDA_PKG)
+	bash /tmp/$(CONDA_PKG) -b -p $(CONDA)
+
+/tmp/$(CONDA_PKG):
+	curl https://repo.anaconda.com/miniconda/$(CONDA_PKG) > /tmp/$(CONDA_PKG) 
 
 package:
 	make clean

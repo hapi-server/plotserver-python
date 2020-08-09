@@ -5,7 +5,7 @@ import time
 import webbrowser
 import requests
 from PIL import Image
-from multiprocessing import Process
+
 from hapiplotserver import hapiplotserver
 
 PORT = 5003
@@ -21,7 +21,11 @@ if False:
 
 if True:
     kwargs = {'port': PORT, 'workers': 1, 'loglevel': 'debug'}
-    process = Process(target=hapiplotserver, kwargs=kwargs)
+    import platform
+    import multiprocessing as mp
+    if platform.system() == "Darwin":
+        mp.set_start_method('spawn')
+    process = mp.Process(target=hapiplotserver, kwargs=kwargs)
     process.start()
     print("test_hapiplotserver.py: Sleeping for 3 seconds while server starts.")
     time.sleep(2)
