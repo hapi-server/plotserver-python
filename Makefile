@@ -17,6 +17,20 @@
 #    make version-update.
 
 PYTHON=python3.6
+PYTHON_VER=$(subst python,,$(PYTHON))
+
+# Select this to have anaconda installed 
+CONDA=./anaconda3
+# or using an existing installation
+#CONDA=/opt/anaconda3
+#CONDA=~/anaconda3
+CONDA_ACTIVATE=source $(CONDA)/etc/profile.d/conda.sh; conda activate
+
+# If CONDA not found, this package will be used and installed in ./anaconda3
+CONDA_PKG=Miniconda3-latest-Linux-x86_64.sh
+ifeq ($(shell uname -s),Darwin)
+	CONDA_PKG=Miniconda3-latest-MacOSX-x86_64.sh
+endif
 
 URL=https://upload.pypi.org
 REP=pypi
@@ -25,6 +39,11 @@ REP=pypi
 VERSION=0.0.5b3
 SHELL:= /bin/bash
 
+CONDA=./anaconda3
+#CONDA=/opt/anaconda3
+#CONDA=~/anaconda3
+CONDA_ACTIVATE=source $(CONDA)/etc/profile.d/conda.sh; conda activate
+
 test:
     make test-virtualenv PYTHON=python3.6
     make test-virtualenv PYTHON=python2.7
@@ -32,15 +51,26 @@ test:
     make test-repository PYTHON=python2.7
 
 test-repository:
+<<<<<<< HEAD
 	- rm -rf $(TMPDIR)/hapi-data
-	source activate $(PYTHON); pip uninstall -y -q hapiplotserver
-	source activate $(PYTHON); $(PYTHON) setup.py develop
-	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_commandline.py
-	source activate $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
+	make condaenv python=$(PYTHON)
+	$(CONDA_ACTIVATE) $(PYTHON) && pip uninstall -y -q hapiplotserver
+	$(CONDA_ACTIVATE) $(PYTHON) && pip install hapiclient
+	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) setup.py develop | grep "Best"
+	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_commandline.py
+	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
+=======
+	make condaenv
+	#https://stackoverflow.com/questions/30306099/pip-install-editable-vs-python-setup-py-develop
+	#$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) setup.py develop | grep "Best"
+	$(CONDA_ACTIVATE) $(PYTHON); pip install --editable . develop
+	$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) hapiplotserver/test/test_commandline.py
+	$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
+>>>>>>> b167cdcb884943a960b180dae9575707bd823862
 
 test-virtualenv:
 	rm -rf env
-	source activate $(PYTHON) && pip install virtualenv && $(PYTHON) -m virtualenv env
+	$(CONDA_ACTIVATE) && pip install virtualenv && $(PYTHON) -m virtualenv env
 	source env/bin/activate && \
 	    pip install pytest requests Pillow && \
         pip install . && \
@@ -52,8 +82,43 @@ test-virtualenv:
 #	    python hapiplotserver/test/test_hapiplotserver.py
 # does not work in virtualenv on OS-X. Logs show
 # hapi(): Reading http://hapi-server.org/servers/TestData/hapi/info?id=dataset1
-# ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response',))
-# This happens even though the test works in the test-repository target.
+# ('Connection aborted.', RemoteDisconnected('Remote end closed connection
+# without response',)). This happens even though the test works in the
+# test-repository target.
+
+conda:
+	make $(CONDA) PYTHON=$(PYTHON)
+
+condaenv: $(CONDA)
+	make $(CONDA)/envs/$(PYTHON) PYTHON=$(PYTHON)
+
+$(CONDA): /tmp/$(CONDA_PKG)
+	bash /tmp/$(CONDA_PKG) -b -p $(CONDA)
+
+/tmp/$(CONDA_PKG):
+	curl https://repo.anaconda.com/miniconda/$(CONDA_PKG) > /tmp/$(CONDA_PKG) 
+
+$(CONDA)/envs/$(PYTHON): $(CONDA)
+	$(CONDA_ACTIVATE); \
+		$(CONDA)/bin/conda create -y --name $(PYTHON) python=$(PYTHON_VER)
+
+CONDA_PKG=Miniconda3-latest-Linux-x86_64.sh
+ifeq ($(shell uname -s),Darwin)
+	CONDA_PKG=Miniconda3-latest-MacOSX-x86_64.sh
+endif
+
+condaenv: 
+	make $(CONDA)/envs/$(PYTHON) PYTHON=$(PYTHON)
+
+$(CONDA)/envs/$(PYTHON): $(CONDA)
+	$(CONDA_ACTIVATE); \
+		$(CONDA)/bin/conda create -y --name $(PYTHON) python=$(PYTHON_VER)
+
+$(CONDA): /tmp/$(CONDA_PKG)
+	bash /tmp/$(CONDA_PKG) -b -p $(CONDA)
+
+/tmp/$(CONDA_PKG):
+	curl https://repo.anaconda.com/miniconda/$(CONDA_PKG) > /tmp/$(CONDA_PKG) 
 
 package:
 	make clean

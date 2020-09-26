@@ -38,5 +38,3 @@ Contact
 
 Submit bug reports and feature requests on the `repository issue
 tracker <https://github.com/hapi-server/plotserver-python/issues>`__.
-
-Bob Weigel rweigel@gmu.edu

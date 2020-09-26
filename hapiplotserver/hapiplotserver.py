@@ -16,7 +16,8 @@ def gunicorn(app, **kwargs):
             def init(self, parser, opts, args):
                 return {
                     'bind': '{0}:{1}'.format(host, kwargs['port']),
-                    'workers': kwargs['workers']
+                    'workers': kwargs['workers'],
+                    'accesslog': '-'
                 }
             
             def load(self):
@@ -36,7 +37,7 @@ def hapiplotserver(**kwargs):
     conf = config(**kwargs)
     application = app(conf)
 
-    __version__ = '0.0.5b3'
+    __version__ = '0.0.5b4'
 
     url = 'http://127.0.0.1:'+str(conf['port'])+"/"
     print(' * flask version ' + flask_version)

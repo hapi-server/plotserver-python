@@ -60,6 +60,9 @@ def app(conf):
         else:
             ct = {'Content-Type': 'text/html'}
 
+        #if loglevel == 'debug':
+        #    print(request.args)
+
         dataset = request.args.get('id')
         if dataset is None and format != 'gallery':
             return 'A dataset id argument is required, e.g., /?server=...&id=...', 400, {'Content-Type': 'text/html'}
@@ -132,14 +135,20 @@ def app(conf):
                 """
                 #return 'An id argument is required if format = "gallery", e.g., /?server=...&id=...[&amp;parameters=...]',\
                 #       400, {'Content-Type': 'text/html'}
+                pass
 
-            indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
 
-            # Get full URL
-            url = url_for("viviz", _external=True)
-            red = url + indexhtm + "#" + vivizhash
-            log("hapiplotserver.app.main(): Redirecting to " + red)
-            return redirect(red, code=302)
+            try:
+                indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
+                # Get full URL
+                url = url_for("viviz", _external=True)
+                red = url + indexhtm + "#" + vivizhash
+                log("hapiplotserver.app.main(): Redirecting to " + red)
+                return redirect(red, code=302)
+            except Exception as e:
+                log(traceback.format_exc())
+                message = traceback.format_exc().split('\n')
+                return message, 500, {'Content-Type': 'text/html'}
 
         # Plot function options
         opts = {'cachedir': cachedir, 'usecache': usecache, 'usedatacache': usedatacache, 'loglevel': loglevel, 'format': format, 'figsize': figsize, 'dpi': dpi, 'transparent': transparent}

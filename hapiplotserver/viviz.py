@@ -217,7 +217,13 @@ def adddataset(server, dataset, indexjs, **kwargs):
             log('hapiplotserver.viviz.adddataset(): Using cached ' + catalogabs)
         return
 
-    meta = hapi(server, dataset)
+    try:
+        opts = {'logging': True}
+        meta = hapi(server, dataset, **opts)
+    except Exception as e:
+        log(traceback.format_exc())
+        message = traceback.format_exc().split('\n')
+        print(message)
 
     gallery = {
                  'id': server,
