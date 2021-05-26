@@ -28,6 +28,7 @@ def config(**kwargs):
             "loglevel": loglevel,
             "threaded": True,
             "workers": workers,
+            "timeout": 90,
             "figsize": (7, 3),
             "format": 'png',
             "dpi": 144,

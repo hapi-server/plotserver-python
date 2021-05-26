@@ -74,13 +74,28 @@ if __name__ == "__main__":
         parser.print_help()
         print(desc)
         sys.exit(0)
+        
+    # TODO: Read pid in '/tmp/gunicorn' + port + ' '.pid' file
+    # Execute 'kill -HUP ' + pid
+    # https://stackoverflow.com/q/9881819
+    # Need to also pass --pid argument to gunicorn() to write .pid file
+    # https://docs.gunicorn.org/en/latest/settings.html?highlight=pid#pidfile
+    # Also handle case when Gunicorn is not used.
+    # if options.stop:
+    # If port pid file not found, show error message and also show list of existing ports by
+    # reading all /tmp/gunicorn* pid files.
+    parser.add_option('-s', '--stop',
+                      dest='stop',
+                      action='store_true',
+                      help='Stop server on default port. Pass --port to specify port.')
 
     opts = {'port': options.port,
             'cachedir': options.cachedir,
             'usecache': bool(options.usecache),
             'loglevel': options.loglevel,
             'threaded': bool(options.threaded),
-            'workers': int(options.workers)
+            'workers': int(options.workers),
+            'timeout': 90
             }
 
     hapiplotserver(**opts)
