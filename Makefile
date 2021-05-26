@@ -36,7 +36,7 @@ URL=https://upload.pypi.org
 REP=pypi
 
 # VERSION below is updated in "make version-update" step.
-VERSION=0.0.5b3
+VERSION=0.0.7b0
 SHELL:= /bin/bash
 
 CONDA=./anaconda3
@@ -51,7 +51,6 @@ test:
     make test-repository PYTHON=python2.7
 
 test-repository:
-<<<<<<< HEAD
 	- rm -rf $(TMPDIR)/hapi-data
 	make condaenv python=$(PYTHON)
 	$(CONDA_ACTIVATE) $(PYTHON) && pip uninstall -y -q hapiplotserver
@@ -59,14 +58,6 @@ test-repository:
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) setup.py develop | grep "Best"
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_commandline.py
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
-=======
-	make condaenv
-	#https://stackoverflow.com/questions/30306099/pip-install-editable-vs-python-setup-py-develop
-	#$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) setup.py develop | grep "Best"
-	$(CONDA_ACTIVATE) $(PYTHON); pip install --editable . develop
-	$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) hapiplotserver/test/test_commandline.py
-	$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
->>>>>>> b167cdcb884943a960b180dae9575707bd823862
 
 test-virtualenv:
 	rm -rf env
