@@ -7,6 +7,7 @@ install_requires = ["hapiclient @ git+https://github.com/hapi-server/client-pyth
                     "Flask==1.0.2",
                     "gunicorn==19.9.0",
                     "python-slugify",
+                    "requests",
                     "Pillow"]
 
 if len(sys.argv) > 1 and sys.argv[1] == 'develop':

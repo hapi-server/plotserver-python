@@ -16,4 +16,9 @@ v0.0.5b4:
 		2020-07-30 -- Logging when using Gunicorn
 v0.0.7b0:
 		2021-05-26 -- 5cadf37 Update README
-		2021-05-26 -- Fix README file extension
+		2021-05-26 -- 58ee656 Fix README file extension
+		2021-05-26 -- c3df8bf Update README
+		2021-05-26 -- 87d302d Update Makefile
+		2021-05-26 -- dba908f Fix README file extension
+		2021-05-26 -- 8568c6a Update import statement
+		2021-05-26 -- 4492136 mp.set_start_method('spawn') no longer needed for Darwin?

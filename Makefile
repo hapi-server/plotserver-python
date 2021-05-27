@@ -100,9 +100,9 @@ repository-test:
 	$(CONDA_ACTIVATE) $(PYTHON); pip install pytest pillow
 	$(CONDA_ACTIVATE) $(PYTHON); pip install --pre --no-cache-dir -e .
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_commandline.py
-	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
-#repository-test-other:
+repository-test-other:
+	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
 ################################################################################
 
@@ -138,7 +138,6 @@ $(CONDA)/envs/$(PYTHON): ./anaconda3
 ################################################################################
 venv-test:
 	source env-$(PYTHON)/bin/activate && \
-		pip install pytest && \
 		pip uninstall -y hapiclient hapiplot hapiplotserver && \
 		pip install --no-cache-dir --pre '$(PACKAGE)' \
 			--index-url $(URL)/simple  \
@@ -156,7 +155,7 @@ package:
 
 package-test-all:
 	@ for version in $(PYTHONVERS) ; do \
-		make repository-test-plots PYTHON=$$version ; \
+		make repository-test PYTHON=$$version ; \
 	done
 
 env-$(PYTHON):
