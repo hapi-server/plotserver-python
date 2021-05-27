@@ -21,6 +21,7 @@ See [test_hapiplotserver.py](https://github.com/hapi-server/plotserver-python/ha
 
 ```bash
 git clone https://github.com/hapi-server/plotserver-python
+cd plotserver-python; pip install -e .
 ```
 
 To run tests before a commit, execute
