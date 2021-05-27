@@ -197,8 +197,6 @@ release-test:
 # Update version based on content of CHANGES.txt
 version-update:
 	python misc/version.py
-	git commit -a -m "bump version to $(VERSION)"
-	git push
 
 version-tag:
 	git commit -a -m "Last $(VERSION) commit"
