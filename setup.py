@@ -1,10 +1,11 @@
 from setuptools import setup, find_packages
 import sys
 
+#"hapiplot @ git+https://github.com/hapi-server/plot-python@main#egg=hapiplot",
 install_requires = ["hapiclient @ git+https://github.com/hapi-server/client-python@master#egg=hapiclient",
+                    "hapiplot",
                     "Flask==1.0.2",
                     "gunicorn==19.9.0",
-                    "matplotlib>=2.2.2",
                     "python-slugify",
                     "Pillow"]
 
@@ -22,7 +23,7 @@ setup(
     url='http://pypi.python.org/pypi/hapiplotserver/',
     license='LICENSE.txt',
     description='Heliophysics API',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     install_requires=install_requires,
     include_package_data=True,
     scripts=["hapiplotserver/hapiplotserver"] 
