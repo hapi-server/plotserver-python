@@ -37,7 +37,7 @@ def hapiplotserver(**kwargs):
     conf = config(**kwargs)
     application = app(conf)
 
-    __version__ = '0.0.7b0'
+    __version__ = '0.0.7b1'
 
     url = 'http://127.0.0.1:'+str(conf['port'])+"/"
     print(' * flask version ' + flask_version)

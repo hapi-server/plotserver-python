@@ -6,7 +6,7 @@ Plot data from a HAPI server.
     List options and usage:
         hapiplotserver -h
 
-Version: 0.0.7b0
+Version: 0.0.7b1
 
 Use GUNICORN_CMD_ARGS="--reload" hapiplotserver ... to reload when files change.
 """

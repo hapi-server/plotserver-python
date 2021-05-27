@@ -34,7 +34,7 @@ PYTHONVERS=python3.8 python3.7 python3.6
 
 # VERSION is updated in "make version-update" step and derived
 # from CHANGES.txt. Do not edit.
-VERSION=0.0.7b0
+VERSION=0.0.7b1
 SHELL:= /bin/bash
 
 LONG_TESTS=false
@@ -197,6 +197,7 @@ release-test:
 # Update version based on content of CHANGES.txt
 version-update:
 	python misc/version.py
+	git commit -a -m "bump version to $(VERSION)"
 
 version-tag:
 	git commit -a -m "Last $(VERSION) commit"
