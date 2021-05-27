@@ -1,155 +1,200 @@
-# Development: Test repository contents:
-#   make test-repository
+# Development:
+# Test repository code:
+#   make repository-test     # Test using $(PYTHON)
+#   make repository-test-all # Test on all versions in $(PYTHONVERS)
 #
-# Make and test a candidate release package in virtual environment:
+# Making a local package:
 # 1. Update CHANGES.txt to have a new version line
 # 2. make package
+# 3. make package-test-all
 #
-# Make release package, upload to pypi.org, and test package
+# Upload package to pypi.org test starting with uploaded package:
 # 1. make release
 # 2. Wait ~5 minutes and execute
-# 3. make test-release
+# 3. make release-test-all
 #    (Will fail until new version is available at pypi.org for pip install.
 #     Sometimes takes ~5 minutes even though web page is immediately
 #     updated.)
 # 4. After package is finalized, create new version number in CHANGES.txt ending
-#    with "bN" in setup.py and then run
-#    make version-update.
+#    with "b0" in setup.py and then run
+#       make version-update
+# 	git commit -a -m "Update version for next release"
+#    This will update the version information in the repository to indicate it
+#    is now in a pre-release state.
 
-PYTHON=python3.6
+PACKAGE_NAME=hapiplotserver
+
+# Default Python version to use for tests
+PYTHON=python3.7
 PYTHON_VER=$(subst python,,$(PYTHON))
 
-# Select this to have anaconda installed 
-CONDA=./anaconda3
-# or using an existing installation
-#CONDA=/opt/anaconda3
-#CONDA=~/anaconda3
-CONDA_ACTIVATE=source $(CONDA)/etc/profile.d/conda.sh; conda activate
+# Python versions to test
+# TODO: Use tox.
+PYTHONVERS=python3.8 python3.7 python3.6
 
-# If CONDA not found, this package will be used and installed in ./anaconda3
-CONDA_PKG=Miniconda3-latest-Linux-x86_64.sh
-ifeq ($(shell uname -s),Darwin)
-	CONDA_PKG=Miniconda3-latest-MacOSX-x86_64.sh
-endif
-
-URL=https://upload.pypi.org
-REP=pypi
-
-# VERSION below is updated in "make version-update" step.
+# VERSION is updated in "make version-update" step and derived
+# from CHANGES.txt. Do not edit.
 VERSION=0.0.7b0
 SHELL:= /bin/bash
 
+LONG_TESTS=false
+
+# Location to install Anaconda. Important: This directory is removed when
+# make test is executed.
 CONDA=./anaconda3
-#CONDA=/opt/anaconda3
-#CONDA=~/anaconda3
+
+# ifeq ($(shell uname -s),MINGW64_NT-10.0-18362)
+ifeq ($(TRAVIS_OS_NAME),windows)
+  # CONDA=/c/tools/anaconda3
+	CONDA=/c/tools/miniconda3
+endif
+
+
 CONDA_ACTIVATE=source $(CONDA)/etc/profile.d/conda.sh; conda activate
 
-test:
-    make test-virtualenv PYTHON=python3.6
-    make test-virtualenv PYTHON=python2.7
-	make test-repository PYTHON=python3.6
-    make test-repository PYTHON=python2.7
+# ifeq ($(shell uname -s),MINGW64_NT-10.0-18362)
+ifeq ($(TRAVIS_OS_NAME),windows)
+	CONDA_ACTIVATE=source $(CONDA)/Scripts/activate; conda activate
+endif
 
-test-repository:
-	- rm -rf $(TMPDIR)/hapi-data
-	make condaenv python=$(PYTHON)
-	$(CONDA_ACTIVATE) $(PYTHON) && pip uninstall -y -q hapiplotserver
-	$(CONDA_ACTIVATE) $(PYTHON) && pip install hapiclient
-	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) setup.py develop | grep "Best"
+
+URL=https://upload.pypi.org/
+REP=pypi
+
+pythonw=$(PYTHON)
+
+# ifeq ($(shell uname -s),MINGW64_NT-10.0-18362)
+ifeq ($(TRAVIS_OS_NAME),windows)
+	pythonw=python
+endif
+
+ifeq ($(UNAME_S),Darwin)
+	# Use pythonw instead of python. On OS-X, this prevents "need to install
+	# python as a framework" error. The following finds the path to the binary
+	# of $(PYTHON) and replaces it with pythonw, e.g., 
+	# /opt/anaconda3/envs/python3.6/bin/python3.6
+	# -> 
+	# /opt/anaconda3/envs/python3.6/bin/pythonw
+	a=$(shell source activate $(PYTHON); which $(PYTHON))
+	pythonw=$(subst bin/$(PYTHON),bin/pythonw,$(a))
+endif
+
+################################################################################
+# Test contents in repository using different python versions
+test:
+	make repository-test-all
+
+repository-test-all:
+	- rm -rf $(CONDA)
+	@ for version in $(PYTHONVERS) ; do \
+		make repository-test PYTHON=$$version ; \
+	done
+
+# These require visual inspection.
+repository-test:
+	@make clean
+	- conda remove --name $(PYTHON) --all -y
+	make condaenv PYTHON=$(PYTHON)
+	pip uninstall -y hapiclient hapiplot hapiplotserver
+	$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) setup.py develop | grep "Best"
+	$(CONDA_ACTIVATE) $(PYTHON); pip install pytest pillow
+	$(CONDA_ACTIVATE) $(PYTHON); pip install --pre --no-cache-dir -e .
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_commandline.py
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_hapiplotserver.py
 
-test-virtualenv:
-	rm -rf env
-	$(CONDA_ACTIVATE) && pip install virtualenv && $(PYTHON) -m virtualenv env
-	source env/bin/activate && \
-	    pip install pytest requests Pillow && \
-        pip install . && \
-        pip install ../client-python
-	source env/bin/activate && \
-	    python hapiplotserver/test/test_commandline.py
+#repository-test-other:
 
-#	source env/bin/activate && \
-#	    python hapiplotserver/test/test_hapiplotserver.py
-# does not work in virtualenv on OS-X. Logs show
-# hapi(): Reading http://hapi-server.org/servers/TestData/hapi/info?id=dataset1
-# ('Connection aborted.', RemoteDisconnected('Remote end closed connection
-# without response',)). This happens even though the test works in the
-# test-repository target.
+################################################################################
 
-conda:
-	make $(CONDA) PYTHON=$(PYTHON)
-
-condaenv: $(CONDA)
-	make $(CONDA)/envs/$(PYTHON) PYTHON=$(PYTHON)
-
-$(CONDA): /tmp/$(CONDA_PKG)
-	bash /tmp/$(CONDA_PKG) -b -p $(CONDA)
-
-/tmp/$(CONDA_PKG):
-	curl https://repo.anaconda.com/miniconda/$(CONDA_PKG) > /tmp/$(CONDA_PKG) 
-
-$(CONDA)/envs/$(PYTHON): $(CONDA)
-	$(CONDA_ACTIVATE); \
-		$(CONDA)/bin/conda create -y --name $(PYTHON) python=$(PYTHON_VER)
-
+################################################################################
+# Anaconda
 CONDA_PKG=Miniconda3-latest-Linux-x86_64.sh
 ifeq ($(shell uname -s),Darwin)
 	CONDA_PKG=Miniconda3-latest-MacOSX-x86_64.sh
 endif
 
-condaenv: 
-	make $(CONDA)/envs/$(PYTHON) PYTHON=$(PYTHON)
 
-$(CONDA)/envs/$(PYTHON): $(CONDA)
+condaenv:
+# ifeq ($(shell uname -s),MINGW64_NT-10.0-18362)
+ifeq ($(TRAVIS_OS_NAME),windows)
+	cp $(CONDA)/Library/bin/libcrypto-1_1-x64.* $(CONDA)/DLLs/
+	cp $(CONDA)/Library/bin/libssl-1_1-x64.* $(CONDA)/DLLs/
+	$(CONDA)/Scripts/conda create -y --name $(PYTHON) python=$(PYTHON_VER)
+else
+	make $(CONDA)/envs/$(PYTHON) PYTHON=$(PYTHON)
+endif
+
+$(CONDA)/envs/$(PYTHON): ./anaconda3
 	$(CONDA_ACTIVATE); \
 		$(CONDA)/bin/conda create -y --name $(PYTHON) python=$(PYTHON_VER)
 
-$(CONDA): /tmp/$(CONDA_PKG)
+./anaconda3: /tmp/$(CONDA_PKG)
 	bash /tmp/$(CONDA_PKG) -b -p $(CONDA)
 
 /tmp/$(CONDA_PKG):
 	curl https://repo.anaconda.com/miniconda/$(CONDA_PKG) > /tmp/$(CONDA_PKG) 
+################################################################################
 
+################################################################################
+venv-test:
+	source env-$(PYTHON)/bin/activate && \
+		pip install pytest && \
+		pip uninstall -y hapiclient hapiplot hapiplotserver && \
+		pip install --no-cache-dir --pre '$(PACKAGE)' \
+			--index-url $(URL)/simple  \
+			--extra-index-url https://pypi.org/simple && \
+		env-$(PYTHON)/bin/python hapiplotserver/test/test_commandline.py && \
+		env-$(PYTHON)/bin/python hapiplotserver/test/test_commandline.py
+################################################################################
+
+################################################################################
+# Packaging
 package:
 	make clean
 	make version-update
 	python setup.py sdist
-	#make test-package PYTHON=python3.6
-	#make test-package PYTHON=python2.7
 
-test-package:
-	rm -rf env
-	$(PYTHON) -m virtualenv env
-	source env/bin/activate && \
-		pip install pytest && \
-		pip install dist/hapiplotserver-$(VERSION).tar.gz \
-			--index-url $(URL)/simple \
-			--extra-index-url https://pypi.org/simple
-	source env/bin/activate && \
-	    bash hapiplotserver/test/test_hapiplotserver.sh
-	source env/bin/activate && \
-	    python hapiplotserver/test/test_hapiplotserver.py
+package-test-all:
+	@ for version in $(PYTHONVERS) ; do \
+		make repository-test-plots PYTHON=$$version ; \
+	done
 
-test-release:
-	rm -rf env
-	python3 -m virtualenv env
-	source env/bin/activate && \
-		pip install pytest && \
-		pip install 'hapiplotserver==$(VERSION)' \
-			--index-url $(URL)/simple  \
-			--extra-index-url https://pypi.org/simple 
+env-$(PYTHON):
+	$(CONDA_ACTIVATE) $(PYTHON); \
+		conda install -y virtualenv; \
+		$(PYTHON) -m virtualenv env-$(PYTHON)
 
+package-test:
+	make package
+	make env-$(PYTHON)
+	make venv-test PACKAGE='dist/$(PACKAGE_NAME)-$(VERSION).tar.gz'
+################################################################################
+
+################################################################################
 release:
 	make package
 	make version-tag
 	make release-upload
 
 release-upload:
+	pip install twine
 	echo "rweigel, t1p"
-	twine upload -r $(REP) dist/hapiplotserver-$(VERSION).tar.gz --config-file misc/pypirc
-	echo Uploaded to $(subst upload.,,$(URL))/project/hapiplotserver/
+	twine upload \
+		-r $(REP) dist/$(PACKAGE_NAME)-$(VERSION).tar.gz \
+		&& echo Uploaded to $(subst upload.,,$(URL))/project/$(PACKAGE_NAME)/
 
+release-test-all:
+	@ for version in $(PYTHONVERS) ; do \
+		make release-test PYTHON=$$version ; \
+	done
+
+release-test:
+	rm -rf env
+	$(CONDA_ACTIVATE) $(PYTHON); pip install virtualenv; $(PYTHON) -m virtualenv env
+	make venv-test PACKAGE='$(PACKAGE_NAME)==$(VERSION)'
+################################################################################
+
+################################################################################
 # Update version based on content of CHANGES.txt
 version-update:
 	python misc/version.py
@@ -159,28 +204,30 @@ version-tag:
 	git push
 	git tag -a v$(VERSION) -m "Version "$(VERSION)
 	git push --tags
+################################################################################
 
-# Use package in ./hapiplotserver instead of that installed by pip.
-# This seems to not work in Spyder.
+################################################################################
+# Install package in local directory (symlinks made to local dir)
 install-local:
-	python setup.py install
+	#python setup.py -e .
+	$(CONDA_ACTIVATE) $(PYTHON); pip install --editable .
 
 install:
-	pip install 'hapiplotserver==$(VERSION)' --index-url $(URL)simple
-	conda list | grep hapiplotserver
-	pip list | grep hapiplotserver
+	pip install '$(PACKAGE_NAME)==$(VERSION)' --index-url $(URL)/simple
+	conda list | grep $(PACKAGE_NAME)
+	pip list | grep $(PACKAGE_NAME)
+################################################################################
 
 clean:
-	- rm -rf $(TMPDIR)/hapi-data
-	- python setup.py --uninstall
-	- find . -name __pycache__ | xargs rm -rf {}
-	- find . -name *.pyc | xargs rm -rf {}
-	- find . -name *.DS_Store | xargs rm -rf {}
-	- find . -type d -name __pycache__ | xargs rm -rf {}
-	- find . -name *.pyc | xargs rm -rf {}
-	- rm -f *~
-	- rm -f \#*\#
-	- rm -rf env dist build
-	- rm -f MANIFEST
-	- rm -rf .pytest_cache/
-	- rm -rf *.egg-info/
+	- @find . -name __pycache__ | xargs rm -rf {}
+	- @find . -name *.pyc | xargs rm -rf {}
+	- @find . -name *.DS_Store | xargs rm -rf {}
+	- @find . -type d -name __pycache__ | xargs rm -rf {}
+	- @find . -name *.pyc | xargs rm -rf {}
+	- @rm -f *~
+	- @rm -f \#*\#
+	- @rm -rf env
+	- @rm -rf dist
+	- @rm -f MANIFEST
+	- @rm -rf .pytest_cache/
+	- @rm -rf $(PACKAGE_NAME).egg-info/
