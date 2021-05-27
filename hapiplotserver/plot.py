@@ -1,5 +1,5 @@
 from hapiclient.hapi import hapi, request2path
-from hapiclient.hapiplot import hapiplot
+from hapiplot import hapiplot
 from hapiplotserver.log import log
 from hapiclient import __version__ as hapiclient_version
 
