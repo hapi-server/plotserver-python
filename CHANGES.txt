@@ -15,3 +15,5 @@ v0.0.5b3:
 v0.0.5b4:
 		2020-07-30 -- Logging when using Gunicorn
 v0.0.7b0:
+		2021-05-26 -- 5cadf37 Update README
+		2021-05-26 -- Fix README file extension
