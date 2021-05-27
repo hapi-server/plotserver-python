@@ -2,7 +2,8 @@ from setuptools import setup, find_packages
 import sys
 
 #"hapiplot @ git+https://github.com/hapi-server/plot-python@main#egg=hapiplot",
-install_requires = ["hapiclient @ git+https://github.com/hapi-server/client-python@master#egg=hapiclient",
+#"hapiclient @ git+https://github.com/hapi-server/client-python@master#egg=hapiclient"
+install_requires = ["hapiclient",
                     "hapiplot",
                     "Flask==1.0.2",
                     "gunicorn==19.9.0",
