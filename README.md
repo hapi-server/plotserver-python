@@ -1,6 +1,6 @@
 **HAPI Plot Server for Python 3.6+**
 
-Serve plots from a HAPI server using the `hapiplot` function in [hapiplot](http://github.com/hapi-server/client-python>).
+Serve plots from a HAPI server using the `hapiplot` function in [hapiplot package](http://github.com/hapi-server/client-python).
 
 [**Live Demo**](http://hapi-server.org/plot)
 
@@ -15,7 +15,7 @@ then see http://localhost:5999/ for API documentation.
 
 # Script Usage
 
-See [test_hapiplotserver.py](https://github.com/hapi-server/plotserver-python/hapiplotserver/master/test_hapiplotserver.py).
+See [test_hapiplotserver.py](https://github.com/hapi-server/plotserver-python/blob/master/hapiplotserver/test/test_hapiplotserver.py).
 
 # Development
 
