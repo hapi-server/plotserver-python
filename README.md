@@ -2,7 +2,7 @@
 
 Serve plots from a HAPI server using the `hapiplot` function in [hapiplot](http://github.com/hapi-server/client-python>).
 
-Demo: [http://hapi-server.org/plot](http://hapi-server.org/plot>)
+[**Live Demo**](http://hapi-server.org/plot)
 
 # Installation and Startup
 
