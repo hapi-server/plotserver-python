@@ -34,7 +34,7 @@ PYTHONVERS=python3.8 python3.7 python3.6
 
 # VERSION is updated in "make version-update" step and derived
 # from CHANGES.txt. Do not edit.
-VERSION=0.0.7b1
+VERSION=0.1.0
 SHELL:= /bin/bash
 
 LONG_TESTS=false
@@ -81,6 +81,7 @@ endif
 
 ################################################################################
 # Test contents in repository using different python versions
+.PHONY: test
 test:
 	make repository-test-all
 

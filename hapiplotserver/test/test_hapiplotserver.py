@@ -22,10 +22,9 @@ if False:
 if True:
 
     kwargs = {'port': PORT, 'workers': 1, 'loglevel': 'debug'}
-    import platform
     import multiprocessing as mp
-    #if platform.system() == "Darwin":
-    #    mp.set_start_method('spawn')
+    #import platform
+    #if platform.system() == "Darwin": print(mp.get_context("spawn"))
     process = mp.Process(target=hapiplotserver, kwargs=kwargs)
     process.start()
     print("test_hapiplotserver.py: Sleeping for 3 seconds while server starts.")
