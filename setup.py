@@ -5,6 +5,7 @@ import sys
 #"hapiclient @ git+https://github.com/hapi-server/client-python@master#egg=hapiclient"
 install_requires = ["hapiclient",
                     "hapiplot",
+                    "isodate",
                     "Flask==1.0.2",
                     "gunicorn==19.9.0",
                     "python-slugify",
@@ -26,6 +27,7 @@ setup(
     license='LICENSE.txt',
     description='Heliophysics API',
     long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     install_requires=install_requires,
     include_package_data=True,
     scripts=["hapiplotserver/hapiplotserver"] 

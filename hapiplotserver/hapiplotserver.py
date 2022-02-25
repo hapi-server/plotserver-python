@@ -4,7 +4,6 @@ from flask import __version__ as flask_version
 from hapiplotserver.app import app
 from hapiplotserver.config import config
 from hapiplotserver.viviz import getviviz
-from hapiclient import __version__ as hapiclient_version
 
 def gunicorn(app, **kwargs):
 
@@ -37,12 +36,15 @@ def hapiplotserver(**kwargs):
     conf = config(**kwargs)
     application = app(conf)
 
-    __version__ = '0.1.0'
+    from hapiplotserver import __version__ as hapiplotserver_version
+    from hapiclient import __version__ as hapiclient_version
+    from hapiplot import __version__ as hapiplot_version
 
     url = 'http://127.0.0.1:'+str(conf['port'])+"/"
     print(' * flask version ' + flask_version)
-    print(' * hapiplotserver version ' + __version__)
+    print(' * hapiplotserver version ' + hapiplotserver_version)
     print(' * hapiclient version ' + hapiclient_version)
+    print(' * hapiplot version ' + hapiplot_version)
     print(' * python version %d.%d.%d' % (sys.version_info[0], sys.version_info[1], sys.version_info[2]))
     print(' * Starting server for ' + url)
     print(' * See ' + url + ' for API description.')

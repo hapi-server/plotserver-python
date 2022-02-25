@@ -6,16 +6,30 @@ from hapiclient import hapi
 from hapiplotserver.log import log
 from hapiplotserver.plot import plot
 from hapiplotserver.viviz import vivizconfig
+
+import platform
+python_version = platform.python_version()
 from hapiclient import __version__ as hapiclient_version
+from hapiplot import __version__ as hapiplot_version
+from hapiplotserver import __version__ as hapiplotserver_version
+
 
 def app(conf):
 
     from flask import Flask, Response, request, redirect, send_from_directory, make_response, url_for
+    from werkzeug.routing import BaseConverter
     application = Flask(__name__)
 
     loglevel = conf['loglevel']
     cachedir = conf['cachedir']
     appdir = os.path.abspath(os.path.dirname(__file__))
+
+    with open(appdir + "/html/" + "index.html", "rt") as f:
+        indexhtml = f.read()
+        indexhtml = indexhtml.replace("<code>hapiplotserver-VERSION</code>", "<code>hapiplotserver-" + hapiplotserver_version + "</code>")
+        indexhtml = indexhtml.replace("<code>hapiplot-VERSION</code>", "<code>hapiplot-" + hapiplot_version + "</code>")
+        indexhtml = indexhtml.replace("<code>hapiclient-VERSION</code>", "<code>hapiclient-" + hapiclient_version + "</code>")
+        indexhtml = indexhtml.replace("<code>python-VERSION</code>", "<code>python-" + python_version + "</code>")
 
     def cacheopts(cachestr):
         usecache = request.args.get(cachestr)
@@ -45,7 +59,8 @@ def app(conf):
 
         server = request.args.get('server')
         if server is None:
-            return send_from_directory(appdir + "/html/", "index.html")
+            return indexhtml, 200, {'Content-Type': 'text/html'}
+            #return send_from_directory(appdir + "/html/", "index.html")
 
         format = request.args.get('format')
         if format is None:
@@ -167,11 +182,34 @@ def app(conf):
     def viviz():
         pass
 
+    # https://stackoverflow.com/a/5872904
+    class RegexConverter(BaseConverter):
+        def __init__(self, url_map, *items):
+            super(RegexConverter, self).__init__(url_map)
+            self.regex = items[0]
+
+    application.url_map.converters['regex'] = RegexConverter
+
+    @application.route('/viviz/<regex("[0-9a-f]{4}"):uid>')
+    def vivizid(uid):
+        response = make_response(send_from_directory(cachedir + "/viviz-hapi", uid))
+        response.headers['Content-Type'] = 'text/html'
+        response.headers['Content-Disposition'] = 'inline'
+        return response
+
+
     # Serve static files
-    @application.route("/viviz/"+"<path:filename>")
+    @application.route("/viviz/hapi/" + "<path:filename>")
+    def vivizidfiles(filename):
+        print(filename)
+        response = make_response(send_from_directory(cachedir + "/viviz-hapi", filename))
+        return response
+
+    # Serve static files
+    @application.route("/viviz/" + "<path:filename>")
     def vivizf(filename):
-        fname, fext = os.path.splitext(cachedir+"/viviz/" + filename)
-        response = make_response(send_from_directory(cachedir+"/viviz", filename))
+        fname, fext = os.path.splitext(cachedir + "/viviz/" + filename)
+        response = make_response(send_from_directory(cachedir + "/viviz", filename))
         if not fext:
             response.headers['Content-Type'] = 'text/html'
             response.headers['Content-Disposition'] = 'inline'

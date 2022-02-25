@@ -11,6 +11,9 @@ import re
 
 overwrite = True
 
+from hapiclient import __version__ as hapiclient_version
+from hapiplot import __version__ as hapiplot_version
+
 # Get last version in CHANGES.txt
 print("Finding version information from CHANGES.txt")
 fin = open("CHANGES.txt")
@@ -23,9 +26,22 @@ fin.close()
 version = version.rstrip()
 print("Using version = " + version)
 
-fnames = ["Makefile","setup.py", "hapiplotserver/hapiplotserver.py", "hapiplotserver/hapiplotserver", "hapiplotserver/html/index.html"]
-regexes = ["VERSION=(.*)","version=(.*)","__version__ = (.*)", "Version: (.*)", "<code>hapiplotserver-(.*)</code>"]
-replaces = ["VERSION=" + version, "version='" + version + "',", "__version__ = '" + version + "'", "Version: " + version, "<code>hapiplotserver-" + version + "</code>"]
+fnames = ["Makefile",
+			"setup.py",
+			"hapiplotserver/__init__.py",
+			"hapiplotserver/hapiplotserver"
+			]
+regexes = ["VERSION=(.*)",
+			"version=(.*)",
+			"__version__ = (.*)",
+			"Version: (.*)"
+			]
+replaces = ["VERSION=" + version,
+			"version='" + version + "',",
+			"__version__ = '" + version + "'",
+			"Version: " + version
+			]
+
 for i in range(len(fnames)):
 	updated = False
 	is_up_to_date = False
