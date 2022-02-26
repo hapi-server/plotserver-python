@@ -25,7 +25,7 @@
 PACKAGE_NAME=hapiplotserver
 
 # Default Python version to use for tests
-PYTHON=python3.7
+PYTHON=python3.8
 PYTHON_VER=$(subst python,,$(PYTHON))
 
 # Python versions to test
@@ -41,14 +41,13 @@ LONG_TESTS=false
 
 # Location to install Anaconda. Important: This directory is removed when
 # make test is executed.
-CONDA=./anaconda3
+CONDA=anaconda3
 
 # ifeq ($(shell uname -s),MINGW64_NT-10.0-18362)
 ifeq ($(TRAVIS_OS_NAME),windows)
   # CONDA=/c/tools/anaconda3
 	CONDA=/c/tools/miniconda3
 endif
-
 
 CONDA_ACTIVATE=source $(CONDA)/etc/profile.d/conda.sh; conda activate
 
@@ -98,8 +97,9 @@ repository-test:
 	make condaenv PYTHON=$(PYTHON)
 	pip uninstall -y hapiclient hapiplot hapiplotserver
 	$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) setup.py develop | grep "Best"
-	$(CONDA_ACTIVATE) $(PYTHON); pip install pytest pillow
+	#$(CONDA_ACTIVATE) $(PYTHON); pip install pytest
 	$(CONDA_ACTIVATE) $(PYTHON); pip install --pre --no-cache-dir -e .
+	bash hapiplotserver/test/test_hapiplotserver.sh
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_commandline.py
 
 repository-test-other:
@@ -114,7 +114,6 @@ ifeq ($(shell uname -s),Darwin)
 	CONDA_PKG=Miniconda3-latest-MacOSX-x86_64.sh
 endif
 
-
 condaenv:
 # ifeq ($(shell uname -s),MINGW64_NT-10.0-18362)
 ifeq ($(TRAVIS_OS_NAME),windows)
@@ -125,12 +124,12 @@ else
 	make $(CONDA)/envs/$(PYTHON) PYTHON=$(PYTHON)
 endif
 
-$(CONDA)/envs/$(PYTHON): ./anaconda3
+$(CONDA)/envs/$(PYTHON): $(CONDA)
 	$(CONDA_ACTIVATE); \
 		$(CONDA)/bin/conda create -y --name $(PYTHON) python=$(PYTHON_VER)
 
-./anaconda3: /tmp/$(CONDA_PKG)
-	bash /tmp/$(CONDA_PKG) -b -p $(CONDA)
+$(CONDA): /tmp/$(CONDA_PKG)
+	bash /tmp/$(CONDA_PKG) -u -b -p $(CONDA)
 
 /tmp/$(CONDA_PKG):
 	curl https://repo.anaconda.com/miniconda/$(CONDA_PKG) > /tmp/$(CONDA_PKG) 

@@ -4,18 +4,18 @@ DIR=$(dirname "$0")/..
 
 # Kill old processes
 echo "test_hapiplotserver.sh: Killing any running hapiplotserver listening on port 5001."
-pkill -f "hapiplotserver --port 5001"
+pkill -f "hapiplotserver --port 5003"
 
 which hapiplotserver
 
 # Start server
-cmd="hapiplotserver --port 5001 --workers 2 --loglevel debug &"
+cmd="hapiplotserver --port 5003 --workers 2 --loglevel debug &"
 echo "test_hapiplotserver.sh: Starting server using $cmd"
 eval $cmd
 
 PID=$!
 
-echo "test_hapiplotserver.sh: Sleeping for 2 seconds before running tests."
+echo "test_hapiplotserver.sh: Sleeping for 3 seconds before running tests."
 sleep 3
 
 echo "test_hapiplotserver.sh: Running tests."
@@ -37,6 +37,7 @@ do
 	#Split string of form expect;url in line of file
 	#url=${url#*;}
 	#expect=${url%%;*}
+	url=http://localhost:5003/$url
 	echo "test_hapiplotserver.sh: Testing: $url"
 	curl -s $url > $TMPDIR/a.png
 	curl -s $url > ~/Desktop/a.png

@@ -3,14 +3,24 @@ import sys
 
 #"hapiplot @ git+https://github.com/hapi-server/plot-python@main#egg=hapiplot",
 #"hapiclient @ git+https://github.com/hapi-server/client-python@master#egg=hapiclient"
+
+# See 
+# https://itsmycode.com/importerror-cannot-import-name-json-from-itsdangerous/
+# for motivation for setting version for markupsafe (which is not used by
+# hapiplotervers) here.
 install_requires = ["hapiclient",
                     "hapiplot",
                     "isodate",
-                    "Flask==1.0.2",
+                    "markupsafe==2.0.1",
+                    "Flask==1.1.4",
                     "gunicorn==19.9.0",
+                    "requests==2.27.1",
                     "python-slugify",
-                    "requests",
                     "Pillow"]
+
+if sys.version_info <= (3, 7):
+    install_requires.insert(0,'numpy<=1.19')
+    install_requires.insert(0,'matplotlib<3.4')
 
 if len(sys.argv) > 1 and sys.argv[1] == 'develop':
     install_requires.append("Pillow")

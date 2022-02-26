@@ -28,3 +28,7 @@ v0.0.7b1:
 v0.1.0:
 		2021-06-16
 
+v0.1.1:
+		2022-02-25 -- 262d0aba Gallery settings depend on cadence. 
+		2022-02-25 -- 262d0aba Generated files in different dir.
+		2022-02-25 -- 262d0aba Generated files in different dir.
