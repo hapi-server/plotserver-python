@@ -32,3 +32,4 @@ v0.1.1:
 		2022-02-25 -- 262d0ab Gallery settings depend on cadence. 
 		2022-02-25 -- 262d0ab Generated files in different dir.
 		2022-02-25 -- 4e752ef Test fixes
+		2022-03-01 -- Decode URI parameters

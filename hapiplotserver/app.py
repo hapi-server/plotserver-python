@@ -1,6 +1,7 @@
 import re
 import os
 import traceback
+import urllib
 
 from hapiclient import hapi
 from hapiplotserver.log import log
@@ -61,6 +62,8 @@ def app(conf):
         if server is None:
             return indexhtml, 200, {'Content-Type': 'text/html'}
             #return send_from_directory(appdir + "/html/", "index.html")
+        else:
+            server = urllib.parse.unquote(server, encoding='utf-8')
 
         format = request.args.get('format')
         if format is None:
@@ -81,18 +84,28 @@ def app(conf):
         dataset = request.args.get('id')
         if dataset is None and format != 'gallery':
             return 'A dataset id argument is required, e.g., /?server=...&id=...', 400, {'Content-Type': 'text/html'}
+        else:
+            dataset = urllib.parse.unquote(dataset, encoding='ut-f8')
+
 
         parameters = request.args.get('parameters')
         if parameters is None and format != 'gallery':
             return 'A parameters argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
+        else:
+            parameters = urllib.parse.unquote(parameters, encoding='utf-8')
 
         start = request.args.get('time.min')
+
         if start is None and format != 'gallery':
             return 'A time.min argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
+        else:
+            start = urllib.parse.unquote(start)
 
         stop = request.args.get('time.max')
         if start is None and format != 'gallery':
             return 'A time.max argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
+        else:
+            stop = urllib.parse.unquote(stop)
 
         meta = None
         if start is None and format != 'gallery':
@@ -138,6 +151,7 @@ def app(conf):
         if figsize is None:
             figsize = conf['figsize']
         else:
+            figsize = urllib.parse.unquote(figsize)
             figsizearr = figsize.split(',')
             figsize = (float(figsizearr[0]), float(figsizearr[1]))
             # TODO: Set limits on figsize?
