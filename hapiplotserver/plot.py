@@ -1,7 +1,13 @@
+import platform
 from hapiclient.hapi import hapi, request2path
 from hapiplot import hapiplot
 from hapiplotserver.log import log
+
+python_version = platform.python_version()
 from hapiclient import __version__ as hapiclient_version
+from hapiclient import __version__ as hapiclient_version
+from hapiplot import __version__ as hapiplot_version
+from hapiplotserver import __version__ as hapiplotserver_version
 
 
 def errorimage(figsize, format, dpi, message):
@@ -12,36 +18,46 @@ def errorimage(figsize, format, dpi, message):
     from matplotlib.figure import Figure
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
+
     j = 0
     # Look for last line in stack trace with HAPI error message.
     for i in range(0, len(message)):
-        if message[i].startswith("hapiclient.util.error.<locals>.HAPIError:"):
+        if message[i].startswith("hapiclient.util.HAPIError: "):
             j = i
     if j > 0:
-        msg = message[j].replace('hapiclient.util.error.<locals>.HAPIError:', '')
+        msg = message[j].replace('hapiclient.util.HAPIError: ', '')
     else:
         for i in range(0, len(message)):
             message[i] = re.sub(r'(.*)File ".*/(.*)"', r'\1File \2', message[i])
         msg = "\n".join(message)
 
-    msg = "hapiclient version " + hapiclient_version + "\n" + msg
+    msgv = "| hapiplotserver v" + hapiplot_version + " | "
+    msgv = msgv + "hapiplot v" + hapiplot_version + " | "
+    msgv = msgv + "hapiclient v" + hapiclient_version + " | "
+    msgv = msgv + "python v" + python_version + " | \n"
 
+    msg = msgv + msg
     msgo = msg
+
     # Make URL easier to read on image by inserting newlines.
     msg = re.sub(r' http(.*)', r'\nhttp\1', msg)
     msg = msg.replace("&", "\n   &")
     msg = msg.replace("?", "\n   &")
+    msg = msg.replace(". ", "\n")
+    msg = msg.replace("\n\n", "\n")
 
     fig = Figure(figsize=figsize)
     canvas = FigureCanvas(fig)
     ax = fig.add_subplot(111)
-    ax.plot([0, 0], [0, 0])
-    ax.set(ylim=(-1, 1), xlim=(-1, 1))
+    #ax.plot([0, 0], [1, 1])
+    ax.set(xlim=(0, 1), ylim=(0, 1))
     ax.set_axis_off()
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
-    ax.text(-1, 1, msg, verticalalignment='top', horizontalalignment='left')
+    txt = ax.text(0, 1, msg, size=6, verticalalignment='top', horizontalalignment='left')
+    # https://stackoverflow.com/questions/48079364/wrapping-text-not-working-in-matplotlib
+    #txt._get_wrap_line_width = lambda : dpi
 
     figdata_obj = BytesIO()
     canvas.print_figure(figdata_obj, format=format, facecolor='red', bbox_inches='tight', dpi=dpi)
