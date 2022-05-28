@@ -4,6 +4,7 @@ from hapiplot import hapiplot
 from hapiplotserver.log import log
 
 python_version = platform.python_version()
+from matplotlib import __version__ as matplotlib_version
 from hapiclient import __version__ as hapiclient_version
 from hapiclient import __version__ as hapiclient_version
 from hapiplot import __version__ as hapiplot_version
@@ -31,9 +32,10 @@ def errorimage(figsize, format, dpi, message):
             message[i] = re.sub(r'(.*)File ".*/(.*)"', r'\1File \2', message[i])
         msg = "\n".join(message)
 
-    msgv = "| hapiplotserver v" + hapiplot_version + " | "
+    msgv = "| hapiplotserver v" + hapiplotserver_version + " | "
     msgv = msgv + "hapiplot v" + hapiplot_version + " | "
     msgv = msgv + "hapiclient v" + hapiclient_version + " | "
+    msgv = msgv + "matplotlib v" + matplotlib_version + " | "
     msgv = msgv + "python v" + python_version + " | \n"
 
     msg = msgv + msg
