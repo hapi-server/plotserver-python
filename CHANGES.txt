@@ -38,4 +38,4 @@ v0.1.2:
 v0.1.3:
 		2022-06-22 -- 4bb7fbf Proxy support
 v0.1.4:
-		2022-06-22 -- Fix default bind
+		2022-06-22 -- 4ebaba4 Fix default bind
