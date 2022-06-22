@@ -22,6 +22,7 @@ def config(**kwargs):
     # debug: show requests, errors, and debug messages
 
     conf = {"port": 5000,
+            "bind": "127.0.0.1",
             "cachedir": os.path.join(tempfile.gettempdir(), 'hapi-data'),
             "usecache": True,
             "usedatacache": True,

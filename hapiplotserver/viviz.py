@@ -5,6 +5,7 @@ def getviviz(**kwargs):
     """Download ViViz web application"""
 
     import os
+    import shutil
     import zipfile
     import requests
 
@@ -42,7 +43,15 @@ def getviviz(**kwargs):
         zipref.extractall(kwargs['cachedir'])
         zipref.close()
 
-        os.rename(vivizdir + "-master", vivizdir)
+        try:
+            shutil.rmtree(vivizdir)
+        except OSError as e:
+            print("Error: %s : %s" % (vivizdir, e.strerror))
+
+        try:
+            os.rename(vivizdir + "-master", vivizdir)
+        except OSError as e:
+            print("Error: %s : %s" % (vivizdir, e.strerror))
 
     else:
         if kwargs['loglevel'] == 'debug':
@@ -68,7 +77,6 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
     import shutil
     import hashlib
     from hapiclient import hapi
-
     slug = req2slug(server, dataset, parameters, start, stop)
 
     gallery_dir = os.path.join(kwargs['cachedir'], "viviz-hapi")
@@ -85,7 +93,7 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
 
     try:
         shutil.copyfile(indexjso, indexjs)
-    except:
+    except OSError as err:
         log("hapiplotserver.viviz.vivizconfig(): Getting ViViz (cache dir {} removed?)".format(kwargs['cachedir']))
         # Creates directory viviz in cachedir
         getviviz(**{**kwargs, **{"reinstall": True}})

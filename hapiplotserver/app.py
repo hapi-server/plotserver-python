@@ -92,20 +92,23 @@ def app(conf):
         if parameters is None and format != 'gallery':
             return 'A parameters argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
         else:
-            parameters = urllib.parse.unquote(parameters, encoding='utf-8')
+            if parameters is not None:
+                parameters = urllib.parse.unquote(parameters, encoding='utf-8')
 
         start = request.args.get('time.min')
 
         if start is None and format != 'gallery':
             return 'A time.min argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
         else:
-            start = urllib.parse.unquote(start)
+            if start is not None:
+                start = urllib.parse.unquote(start)
 
         stop = request.args.get('time.max')
         if start is None and format != 'gallery':
             return 'A time.max argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
         else:
-            stop = urllib.parse.unquote(stop)
+            if stop is not None:
+                stop = urllib.parse.unquote(stop)
 
         meta = None
         if start is None and format != 'gallery':
@@ -166,12 +169,19 @@ def app(conf):
                 #       400, {'Content-Type': 'text/html'}
                 pass
 
+            print(request.headers)
 
             try:
                 indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
                 # Get full URL
-                url = url_for("viviz", _external=True)
+                url = url_for("viviz", _external=False)
+                #print(url)
+                if 'X-Forwarded-Host' in request.headers:
+                    url = "//" + request.headers['X-Forwarded-Host']
+                if 'X-Forwarded-Path' in request.headers:
+                    url = url + request.headers['X-Forwarded-Path'] + "viviz/"
                 red = url + indexhtm + "#" + vivizhash
+                #red = "viviz/" + indexhtm + "#" + vivizhash
                 log("hapiplotserver.app.main(): Redirecting to " + red)
                 return redirect(red, code=302)
             except Exception as e:
