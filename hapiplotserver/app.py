@@ -16,7 +16,7 @@ from hapiplotserver import __version__ as hapiplotserver_version
 
 
 def app(conf):
-
+    print(conf)
     from flask import Flask, Response, request, redirect, send_from_directory, make_response, url_for
     from werkzeug.routing import BaseConverter
     application = Flask(__name__)

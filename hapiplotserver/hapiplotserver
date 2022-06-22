@@ -48,7 +48,7 @@ if __name__ == "__main__":
     parser.add_option("--bind",
                       type="str",
                       help="Bind address " + "[%s]" % conf['bind'],
-                      default=conf['port'])
+                      default=conf['bind'])
     parser.add_option("--cachedir",
                       help="Cache directory " + "[%s]" % conf['cachedir'],
                       default=conf['cachedir'])

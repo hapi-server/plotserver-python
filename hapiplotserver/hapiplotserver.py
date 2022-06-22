@@ -53,7 +53,7 @@ def hapiplotserver(**kwargs):
     getviviz(**conf)
 
     if conf['workers'] == 0:
-        application.run(bind=conf['bind'], port=conf['port'], threaded=conf['threaded'])
+        application.run(port=conf['port'], threaded=conf['threaded'])
     else:
         from sys import platform
         if platform == "darwin" and sys.version_info < (3, 6):
