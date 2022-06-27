@@ -1,0 +1,2 @@
+Before executing, run
+  cd ..; make install-server

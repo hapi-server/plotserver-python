@@ -15,7 +15,7 @@
         <key>ProgramArguments</key>
         <array>
 	  <string>/bin/bash</string>
-          <string>/Users/weigel/git/hapi/plotserver-python/etc/plotserver-python.sh</string>
+          <string>etc/hapiplotserver.sh</string>
         </array>
         <key>RunAtLoad</key>
         <true/>
