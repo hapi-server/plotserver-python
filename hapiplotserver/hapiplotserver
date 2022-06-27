@@ -6,7 +6,7 @@ Plot data from a HAPI server.
     List options and usage:
         hapiplotserver -h
 
-Version: 0.1.1
+Version: 0.1.4
 
 Use GUNICORN_CMD_ARGS="--reload" hapiplotserver ... to reload when files change.
 """
@@ -45,6 +45,10 @@ if __name__ == "__main__":
                       type="int",
                       help="Server port " + "[%s]" % conf['port'],
                       default=conf['port'])
+    parser.add_option("--bind",
+                      type="str",
+                      help="Bind address " + "[%s]" % conf['bind'],
+                      default=conf['bind'])
     parser.add_option("--cachedir",
                       help="Cache directory " + "[%s]" % conf['cachedir'],
                       default=conf['cachedir'])
@@ -89,7 +93,9 @@ if __name__ == "__main__":
                       action='store_true',
                       help='Stop server on default port. Pass --port to specify port.')
 
-    opts = {'port': options.port,
+    opts = {
+            'port': options.port,
+            'bind': options.bind,
             'cachedir': options.cachedir,
             'usecache': bool(options.usecache),
             'loglevel': options.loglevel,

@@ -7,14 +7,14 @@ from hapiplotserver.viviz import getviviz
 
 def gunicorn(app, **kwargs):
 
-    def action(host='127.0.0.1', **kwargs):
-        
+    def action(**kwargs):
+        print(kwargs)
         from gunicorn.app.base import Application
         
         class FlaskApplication(Application):
             def init(self, parser, opts, args):
                 return {
-                    'bind': '{0}:{1}'.format(host, kwargs['port']),
+                    'bind': '{0}:{1}'.format(kwargs['bind'], kwargs['port']),
                     'workers': kwargs['workers'],
                     'accesslog': '-'
                 }
@@ -40,7 +40,7 @@ def hapiplotserver(**kwargs):
     from hapiclient import __version__ as hapiclient_version
     from hapiplot import __version__ as hapiplot_version
 
-    url = 'http://127.0.0.1:'+str(conf['port'])+"/"
+    url = 'http://' + str(conf['bind']) + ':' + str(conf['port']) + "/"
     print(' * flask version ' + flask_version)
     print(' * hapiplotserver version ' + hapiplotserver_version)
     print(' * hapiclient version ' + hapiclient_version)
@@ -58,7 +58,7 @@ def hapiplotserver(**kwargs):
         from sys import platform
         if platform == "darwin" and sys.version_info < (3, 6):
             raise Exception('On OS-X, Python 3.6+ is needed if workers > 0. (A bug in system URL libraries prevents some URL reads from working with gunicorn.)')
-        gunicorn(application, port=conf['port'], workers=conf['workers'], timeout=conf['timeout'])
+        gunicorn(application, bind=conf['bind'], port=conf['port'], workers=conf['workers'], timeout=conf['timeout'])
 
 
 def gunicornx(**kwargs):

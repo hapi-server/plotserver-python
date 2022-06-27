@@ -25,7 +25,7 @@
 PACKAGE_NAME=hapiplotserver
 
 # Default Python version to use for tests
-PYTHON=python3.8
+PYTHON=python3.7
 PYTHON_VER=$(subst python,,$(PYTHON))
 
 # Python versions to test
@@ -34,7 +34,7 @@ PYTHONVERS=python3.8 python3.7 python3.6
 
 # VERSION is updated in "make version-update" step and derived
 # from CHANGES.txt. Do not edit.
-VERSION=0.1.1
+VERSION=0.1.4
 SHELL:= /bin/bash
 
 LONG_TESTS=false
@@ -98,7 +98,7 @@ repository-test:
 	pip uninstall -y hapiclient hapiplot hapiplotserver
 	$(CONDA_ACTIVATE) $(PYTHON); $(PYTHON) setup.py develop | grep "Best"
 	#$(CONDA_ACTIVATE) $(PYTHON); pip install pytest
-	$(CONDA_ACTIVATE) $(PYTHON); pip install --pre --no-cache-dir -e .
+	$(CONDA_ACTIVATE) $(PYTHON); pip install --no-cache-dir -e .
 	bash hapiplotserver/test/test_hapiplotserver.sh
 	$(CONDA_ACTIVATE) $(PYTHON) && $(PYTHON) hapiplotserver/test/test_commandline.py
 
