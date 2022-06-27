@@ -16,7 +16,7 @@ from hapiplotserver import __version__ as hapiplotserver_version
 
 
 def app(conf):
-    print(conf)
+
     from flask import Flask, Response, request, redirect, send_from_directory, make_response, url_for
     from werkzeug.routing import BaseConverter
     application = Flask(__name__)
@@ -169,21 +169,17 @@ def app(conf):
                 #       400, {'Content-Type': 'text/html'}
                 pass
 
-            print(request.headers)
+            # https://stackoverflow.com/questions/30006740/how-can-i-tell-flask-not-to-add-host-scheme-info-to-my-redirect
+            # If used behind a proxy, we need relative redirects.
+            class FixedLocationResponse(Response):
+                autocorrect_location_header = False
 
             try:
                 indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
-                # Get full URL
-                url = url_for("viviz", _external=False)
-                #print(url)
-                if 'X-Forwarded-Host' in request.headers:
-                    url = "//" + request.headers['X-Forwarded-Host']
-                if 'X-Forwarded-Path' in request.headers:
-                    url = url + request.headers['X-Forwarded-Path'] + "viviz/"
-                red = url + indexhtm + "#" + vivizhash
-                #red = "viviz/" + indexhtm + "#" + vivizhash
+                red = "viviz/" + indexhtm + "#" + vivizhash
                 log("hapiplotserver.app.main(): Redirecting to " + red)
-                return redirect(red, code=302)
+                #return redirect(red, code=302)
+                return redirect(red, code=302, Response=FixedLocationResponse)
             except Exception as e:
                 log(traceback.format_exc())
                 message = traceback.format_exc().split('\n')
