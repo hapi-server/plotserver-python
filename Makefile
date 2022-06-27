@@ -118,6 +118,9 @@ CONDA_PKG=Miniconda3-latest-Linux-x86_64.sh
 ifeq ($(shell uname -s),Darwin)
 	CONDA_PKG=Miniconda3-latest-MacOSX-x86_64.sh
 endif
+ifeq ($(shell uname -s),Linux)
+	CONDA_PKG=Miniconda3-latest-Linux-$(shell uname -m).sh
+endif
 
 condaenv:
 # ifeq ($(shell uname -s),MINGW64_NT-10.0-18362)
