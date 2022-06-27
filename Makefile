@@ -7,7 +7,6 @@
 # 1. Update CHANGES.txt to have a new version line
 # 2. make package
 # 3. make package-test-all
-#
 # Upload package to pypi.org test starting with uploaded package:
 # 1. make release
 # 2. Wait ~5 minutes and execute
