@@ -85,7 +85,7 @@ def app(conf):
         if dataset is None and format != 'gallery':
             return 'A dataset id argument is required, e.g., /?server=...&id=...', 400, {'Content-Type': 'text/html'}
         else:
-            dataset = urllib.parse.unquote(dataset, encoding='ut-f8')
+            dataset = urllib.parse.unquote(dataset, encoding='utf-f8')
 
 
         parameters = request.args.get('parameters')
