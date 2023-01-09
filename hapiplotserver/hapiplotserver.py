@@ -8,7 +8,6 @@ from hapiplotserver.viviz import getviviz
 def gunicorn(app, **kwargs):
 
     def action(**kwargs):
-        print(kwargs)
         from gunicorn.app.base import Application
         
         class FlaskApplication(Application):
@@ -41,6 +40,7 @@ def hapiplotserver(**kwargs):
     from hapiplot import __version__ as hapiplot_version
 
     url = 'http://' + str(conf['bind']) + ':' + str(conf['port']) + "/"
+
     print(' * flask version ' + flask_version)
     print(' * hapiplotserver version ' + hapiplotserver_version)
     print(' * hapiclient version ' + hapiclient_version)
@@ -49,6 +49,7 @@ def hapiplotserver(**kwargs):
     print(' * Starting server for ' + url)
     print(' * See ' + url + ' for API description.')
     print(' * Cache directory: ' + conf['cachedir'])
+    print(f" * gunicorn kwargs = {kwargs}")
 
     getviviz(**conf)
 
