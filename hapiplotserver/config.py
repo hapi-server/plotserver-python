@@ -39,6 +39,7 @@ def config(**kwargs):
         if key in kwargs:
             conf[key] = kwargs[key]
 
+    conf['cachedir'] = os.path.abspath(conf['cachedir'])
     if not os.path.exists(conf['cachedir']):
         os.makedirs(conf['cachedir'])
 
