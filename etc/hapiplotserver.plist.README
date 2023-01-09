@@ -4,7 +4,11 @@ sudo chown root:wheel hapiplotserver.plist
 sudo chmod 0644 hapiplotserver.plist
 sudo launchctl unload -w /Library/LaunchDaemons/hapiplotserver.plist
 sudo launchctl load -w /Library/LaunchDaemons/hapiplotserver.plist
+
 sudo launchctl stop hapiplotserver.plist
+Above does not stop service. Not sure why. Use
+pkill -f hapiplotserver.sh
+
 sudo launchctl start hapiplotserver.plist
 sleep 1
 tail /var/log/system.log
