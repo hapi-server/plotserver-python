@@ -1,0 +1,20 @@
+# sudo cp hapiplotserver.service /lib/systemd/system
+# sudo chmod 644 /lib/systemd/system/hapiplotserver.service
+# sudo systemctl enable hapiplotserver
+# sudo systemctl start hapiplotserver
+# sudo systemctl status hapiplotserver
+
+
+[Unit]
+Description=Production HAPI Plot Server
+Documentation=https://github.com/rweigel/hapi-server/plotserver-python
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/plotserver-python
+ExecStart=bash etc/hapiplotserver.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
