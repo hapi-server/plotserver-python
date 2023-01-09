@@ -31,8 +31,12 @@ def getviviz(**kwargs):
 
         try:
             r = requests.get(url, allow_redirects=True)
-        except requests.exceptions.RequestException as e:
+            #except requests.exceptions.RequestException as e:
+        except Exception as e:
             print(e)
+
+        if kwargs['loglevel'] == 'debug':
+            log('hapiplotserver.viviz(): Writing \n\t' + file)
 
         open(file, 'wb').write(r.content)
 
@@ -92,19 +96,21 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
     indexhtmo = os.path.join(viviz_dir, 'index.htm')
 
     try:
+        if kwargs['loglevel'] == 'debug':
+            log(f"hapiplotserver.viviz.vivizconfig(): Copying {indexjso} to {indexjs}")
         shutil.copyfile(indexjso, indexjs)
     except OSError as err:
         log("hapiplotserver.viviz.vivizconfig(): Getting ViViz (cache dir {} removed?)".format(kwargs['cachedir']))
+        print(err)
         # Creates directory viviz in cachedir
+        log(f"Calling getviviz() due to above error")
         getviviz(**{**kwargs, **{"reinstall": True}})
-
-    try:
-        shutil.copyfile(indexjso, indexjs)
-    except:
-        print("Problem with ViViz installation.")
-
-    if kwargs['loglevel'] == 'debug':
-        log('hapiplotserver.viviz.vivizconfig(): Wrote %s' % indexjs)
+        try:
+            if kwargs['loglevel'] == 'debug':
+                log(f"hapiplotserver.viviz.vivizconfig(): Copying {indexjso} to {indexjs}")
+            shutil.copyfile(indexjso, indexjs)
+        except:
+            print("Could not install ViViz")
 
     shutil.copyfile(indexhtmo, indexhtm)
     if kwargs['loglevel'] == 'debug':
@@ -112,14 +118,18 @@ def vivizconfig(server, dataset, parameters, start, stop, **kwargs):
 
     fid = hashlib.md5(bytes(slug, 'utf8')).hexdigest()
     indexhtm_hash = os.path.join(gallery_dir, fid[0:4])
-    if os.path.isfile(indexhtm_hash):
-        os.remove(indexhtm_hash)
+    if os.path.islink(indexhtm_hash):
+        if kwargs['loglevel'] == 'debug':
+            log(f'hapiplotserver.viviz.vivizconfig(): Removing {indexhtm_hash}')
+        os.unlink(indexhtm_hash)
         if kwargs['loglevel'] == 'debug':
             log('hapiplotserver.viviz.vivizconfig(): Removed existing %s' % indexhtm_hash)
 
     if kwargs['loglevel'] == 'debug':
         log('hapiplotserver.viviz.vivizconfig(): Symlinking %s with %s' % (indexhtm, indexhtm_hash))
     os.symlink(indexhtm, indexhtm_hash)
+    if kwargs['loglevel'] == 'debug':
+        log('hapiplotserver.viviz.vivizconfig(): Symlinked %s with %s' % (indexhtm, indexhtm_hash))
     indexhtm_hash = fid[0:4]
 
     indexjs_rel = 'hapi/index-' + slug + '.js'
