@@ -81,30 +81,39 @@ def app(conf):
         #if loglevel == 'debug':
         #    print(request.args)
 
-        dataset = request.args.get('id')
+        dataset_str = 'id'        
+        if request.args.get('id') is not None:
+            dataset = request.args.get('id')
+        if request.args.get('dataset') is not None:
+            dataset = request.args.get('dataset')
+            dataset_str = 'dataset'            
         if dataset is None and format != 'gallery':
-            return 'A dataset id argument is required, e.g., /?server=...&id=...', 400, {'Content-Type': 'text/html'}
+            return 'A dataset id argument is required, e.g., /?server=...&'+dataset_str+'=...', 400, {'Content-Type': 'text/html'}
         else:
             dataset = urllib.parse.unquote(dataset, encoding='utf-f8')
 
-
         parameters = request.args.get('parameters')
         if parameters is None and format != 'gallery':
-            return 'A parameters argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
+            return 'A parameters argument is required if format != "gallery", e.g., /?server=...&'+dataset_str+'=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
         else:
             if parameters is not None:
                 parameters = urllib.parse.unquote(parameters, encoding='utf-8')
 
-        start = request.args.get('time.min')
-
+        if request.args.get('time.min') is not None:
+            start = request.args.get('time.min')
+        if request.args.get('start') is not None:
+            start = request.args.get('start')
         if start is None and format != 'gallery':
-            return 'A time.min argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
+            return 'A time.min or start argument is required if format != "gallery", e.g., /?server=...&'+dataset_str+'id=...&amp;parameters=...&amp;start=...&amp;stop=...', 400, {'Content-Type': 'text/html'}
         else:
             if start is not None:
                 start = urllib.parse.unquote(start)
 
-        stop = request.args.get('time.max')
-        if start is None and format != 'gallery':
+        if request.args.get('time.max') is not None:
+            stop = request.args.get('time.max')
+        if request.args.get('stop') is not None:
+            stop = request.args.get('stop')
+        if stop is None and format != 'gallery':
             return 'A time.max argument is required if format != "gallery", e.g., /?server=...&id=...&amp;parameters=...', 400, {'Content-Type': 'text/html'}
         else:
             if stop is not None:
