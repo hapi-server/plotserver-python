@@ -81,7 +81,8 @@ def app(conf):
         #if loglevel == 'debug':
         #    print(request.args)
 
-        dataset_str = 'id'        
+        dataset_str = 'id'
+        dataset = None
         if request.args.get('id') is not None:
             dataset = request.args.get('id')
         if request.args.get('dataset') is not None:
@@ -99,6 +100,7 @@ def app(conf):
             if parameters is not None:
                 parameters = urllib.parse.unquote(parameters, encoding='utf-8')
 
+        start = None
         if request.args.get('time.min') is not None:
             start = request.args.get('time.min')
         if request.args.get('start') is not None:
@@ -109,6 +111,7 @@ def app(conf):
             if start is not None:
                 start = urllib.parse.unquote(start)
 
+        stop = None
         if request.args.get('time.max') is not None:
             stop = request.args.get('time.max')
         if request.args.get('stop') is not None:
