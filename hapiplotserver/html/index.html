@@ -4,7 +4,6 @@
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 		<title>HAPI Plot Server</title>
 		<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-		<link rel="icon" href="favicon.ico" type="image/x-icon">
 		<style>
 			h1 { font-size: 130%; }
 		</style>
@@ -76,13 +75,13 @@
 				Returns an image of <code>PARAMETERS</code> in dataset <code>ID</code> plotted over the timerange <code>START/STOP</code>.
 			</p>
 			<p>
-				<code>id</code>, <code>parameters</code>, <code>time.min</code>, and <code>time.max</code> are required.
+				<code>id</code> (or <code>dataset</code>), <code>parameters</code>, <code>time.min</code> (or <code>start</code>), and <code>time.max</code> (or <code>stop</code>) are required.
 			</p>
 			<p>
 				Usage
 			</p>
 			<ul>
-				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&time.max=START&time.min=STOP</code></li>
+				<li><code>?server=HAPIURL&start=ID&amp;parameters=PARAMETERS&start=START&stop=STOP</code></li>
 			</ul>
 			<p>Examples</p>
 			<ul id="exampleImageURLs"></ul>
@@ -91,17 +90,17 @@
 				Generates a <a href="http://viviz.org/">ViViz</a> image gallery for a dataset.
 			</p>
 			<ul>
-				<li><code>id</code> is required if <code>format</code> = <code>gallery</code></li>
+				<li><code>id</code> (or <code>dataset</code>) is required if <code>format</code> = <code>gallery</code></li>
 				<li>If <code>parameters</code> is not given, drop-down includes all parameters.</li>
-				<li><code>time.min</code> and/or <code>time.max</code> can be specified to constrain time range of images that can be viewed from default of full time range of available data.</li>
+				<li><code>time.min</code> (or <code>start</code>) and/or <code>time.max</code> (or <code>stop</code>) can be specified to constrain time range of images that can be viewed from default of full time range of available data.</li>
 			</ul>
 			<p>
 				Usage
 			</p>
 			<ul>
-				<li><code>?server=HAPIURL&id=ID&format=gallery</code></li>
-				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&format=gallery</code></li>
-				<li><code>?server=HAPIURL&id=ID&amp;parameters=PARAMETERS&time.max=START&time.min=STOP&format=gallery</code></li>
+				<li><code>?server=HAPIURL&dataset=ID&format=gallery</code></li>
+				<li><code>?server=HAPIURL&dataset=ID&amp;parameters=PARAMETERS&format=gallery</code></li>
+				<li><code>?server=HAPIURL&dataset=ID&amp;parameters=PARAMETERS&start=START&stop=STOP&format=gallery</code></li>
 			</ul>
 			<p>Examples</p>
 			<ul id="exampleGalleryURLs"></ul>

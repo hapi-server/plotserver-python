@@ -1,0 +1,2 @@
+sudo pkill -f hapiplotserver.sh
+sudo launchctl start hapiplotserver.plist
