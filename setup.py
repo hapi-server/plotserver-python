@@ -14,7 +14,7 @@ install_requires = ["hapiclient",
                     "markupsafe==2.0.1",
                     "Flask==1.1.4",
                     "gunicorn==19.9.0",
-                    "requests==2.27.1",
+                    "requests==2.31.0",
                     "python-slugify",
                     "Pillow"]
 
