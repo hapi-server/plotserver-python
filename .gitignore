@@ -1,6 +1,8 @@
 *.pyc
 tmp/
 *~
+cache/
+log/
 .DS_Store
 hapiplotserver.egg-info/
 dist/

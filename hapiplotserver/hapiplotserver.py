@@ -9,7 +9,7 @@ def gunicorn(app, **kwargs):
 
     def action(**kwargs):
         from gunicorn.app.base import Application
-        
+
         class FlaskApplication(Application):
             def init(self, parser, opts, args):
                 return {
@@ -17,7 +17,7 @@ def gunicorn(app, **kwargs):
                     'workers': kwargs['workers'],
                     'accesslog': '-'
                 }
-            
+
             def load(self):
                 return app
         FlaskApplication().run()

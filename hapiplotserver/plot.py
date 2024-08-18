@@ -19,6 +19,8 @@ def errorimage(figsize, format, dpi, message):
     from matplotlib.figure import Figure
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
+    if type(message) is str:
+        message = [message]
 
     j = 0
     # Look for last line in stack trace with HAPI error message.
@@ -106,17 +108,37 @@ def plot(server, dataset, parameters, start, stop, **kwargs):
     logging = False
     if kwargs['loglevel'] == 'debug': logging = True
 
+    if parameters == '' or len(parameters.split(',')) > 2:
+        # This allows
+        #   parameters=p1
+        #   parameters=primaryTimeParameter,p1
+        # and
+        #   parameters=p1,p2
+        # The last case is not supported, but we don't know if the first
+        # parameter is a time parameter or not until we call hapi(). This case
+        # is rejected afer the call to hapi().
+        message = "Sever only supports plotting a single parameter"
+        return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)
+
     try:
         tic = time.time()
         opts = {'logging': logging,
                 'cachedir': kwargs['cachedir'],
                 'usecache':  kwargs['usedatacache']
                 }
+
         if kwargs['loglevel'] == 'debug':
             log('hapiplotserver.plot(): Calling hapi() to get data')
+
         data, meta = hapi(server, dataset, parameters, start, stop, **opts)
+
+        if len(meta['parameters']) > 2:
+            message = "Sever only supports plotting a single parameter"
+            return errorimage(kwargs['figsize'], kwargs['format'], kwargs['dpi'], message)
+
         if kwargs['loglevel'] == 'debug':
             log('hapiplotserver.plot(): Time for hapi() call = %f' % (time.time()-tic))
+
     except Exception as e:
         log(traceback.format_exc())
         message = traceback.format_exc().split('\n')

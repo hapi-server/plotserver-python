@@ -1,2 +1,3 @@
 sudo pkill -f hapiplotserver.sh
+sudo launchctl load -w /Library/LaunchDaemons/hapiplotserver.plist
 sudo launchctl start hapiplotserver.plist

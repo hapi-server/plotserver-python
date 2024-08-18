@@ -81,7 +81,9 @@ install-server:
 	make condaenv PYTHON=python3.7; \
 		source anaconda3/etc/profile.d/conda.sh; conda activate; \
 		conda activate python3.7; \
-		pip install -e .
+		pip install -e .; \
+		cd ../client-python && pip install -e .; \
+		cd ../plot-python && pip install -e .;
 
 ################################################################################
 # Test contents in repository using different python versions

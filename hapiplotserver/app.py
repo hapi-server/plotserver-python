@@ -87,11 +87,11 @@ def app(conf):
             dataset = request.args.get('id')
         if request.args.get('dataset') is not None:
             dataset = request.args.get('dataset')
-            dataset_str = 'dataset'            
+            dataset_str = 'dataset'
         if dataset is None and format != 'gallery':
             return 'A dataset id argument is required, e.g., /?server=...&'+dataset_str+'=...', 400, {'Content-Type': 'text/html'}
         else:
-            dataset = urllib.parse.unquote(dataset, encoding='utf-f8')
+            dataset = urllib.parse.unquote(dataset, encoding='utf-8')
 
         parameters = request.args.get('parameters')
         if parameters is None and format != 'gallery':
@@ -188,7 +188,11 @@ def app(conf):
 
             try:
                 indexhtm, vivizhash = vivizconfig(server, dataset, parameters, start, stop, **conf)
+
                 red = "viviz/" + indexhtm + "#" + vivizhash
+                mode = request.args.get('mode')
+                if mode:
+                    red = red + "&mode=" + mode
                 log("hapiplotserver.app.main(): Redirecting to " + red)
                 #return redirect(red, code=302)
                 return redirect(red, code=302, Response=FixedLocationResponse)
@@ -256,9 +260,12 @@ def app(conf):
             message[i] = re.sub(r'(.*)File ".*/(.*)"', r'\1File \2', message[i])
             message[i] = re.sub(r'\s', r'&nbsp;', message[i])
         msg = "<br/>".join(message)
-        #TODO
-        #vers = "hapiplotserver v" + __version__
-        vers = "hapiclient v" + hapiclient_version + "<br/>"
+        # TODO: Duplicate code in plot.py
+        vers = "| hapiplotserver v" + hapiplotserver_version + " | "
+        vers = vers + "hapiplot v" + hapiplot_version + " | "
+        vers = vers + "hapiclient v" + hapiclient_version + " | "
+        vers = vers + "matplotlib v" + matplotlib_version + " | "
+        vers = vers + "python v" + python_version + " | <br/>"
         return vers + msg, 500
  
     return application
