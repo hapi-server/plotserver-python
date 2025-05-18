@@ -244,10 +244,10 @@ def adddataset(server, dataset, indexjs, **kwargs):
 
     import os
     import json
-    from hapiclient.hapi import hapi, hapitime2datetime, server2dirname
+    from hapiclient.hapi import hapi, server2dirname
 
     fname = server2dirname(server) + '/' + dataset + '.json'
-    catalogabs = kwargs['cachedir'] + '/viviz/catalogs/' + fname
+    catalogabs = kwargs['cachedir'] + '/viviz-hapi/catalogs/' + fname
     catalogrel = 'catalogs/' + fname
 
     dname = os.path.dirname(catalogabs)
@@ -331,7 +331,7 @@ def strftime_str(meta):
             strftime = "time.min=$Y-$m-${d;delta=365}T00:00:00.000Z&time.max=${Y;offset=365}-${m;offset=365}-${d;offset=365}T00:00:00.000Z"
 
     print(strftime)
-    return strftime    
+    return strftime
 
 
 def adjust_time(hapitime, ndays):

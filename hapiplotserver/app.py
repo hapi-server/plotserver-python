@@ -226,20 +226,32 @@ def app(conf):
 
     application.url_map.converters['regex'] = RegexConverter
 
+    if True:
+        @application.route('/viviz/catalogs/<path:filename>')
+        def vivizid2(filename):
+            print("\n0000000 " + filename)
+
+            response = make_response(send_from_directory(cachedir + "/viviz-hapi/catalogs", filename))
+            #response.headers['Content-Type'] = 'text/html'
+            response.headers['Content-Disposition'] = 'inline'
+            return response
+
     @application.route('/viviz/<regex("[0-9a-f]{4}"):uid>')
     def vivizid(uid):
+        print("\n-------" + uid)
+        #fpath = os.path.join(cachedir, "viviz-galleries", uid, filename)
         response = make_response(send_from_directory(cachedir + "/viviz-hapi", uid))
         response.headers['Content-Type'] = 'text/html'
         response.headers['Content-Disposition'] = 'inline'
         return response
 
-
-    # Serve static files
-    @application.route("/viviz/hapi/" + "<path:filename>")
-    def vivizidfiles(filename):
-        print(filename)
-        response = make_response(send_from_directory(cachedir + "/viviz-hapi", filename))
-        return response
+    if True:
+        # Serve static files
+        @application.route("/viviz/hapi/" + "<path:filename>")
+        def vivizidfiles(filename):
+            print("\n+++++++" + filename)
+            response = make_response(send_from_directory(cachedir + "/viviz-hapi", filename))
+            return response
 
     # Serve static files
     @application.route("/viviz/" + "<path:filename>")
